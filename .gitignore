@@ -216,5 +216,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 data
+modelos/mobileNet_selectedFeatures
 submission_templates
+
 submission_templates.zip

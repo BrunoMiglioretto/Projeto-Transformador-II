@@ -22,7 +22,7 @@ from torchvision import transforms, models
 # ==========================
 @dataclass
 class Config:
-    data_root: str = "data"  # raiz que contém Market1501/, PA100k/, etc.
+    data_root: str = "../data"  # raiz que contém Market1501/, PA100k/, etc.
     train_csv: str = "Market1501/annotations/phase1/train/train.csv"
     val1_csv: str   = "Market1501/annotations/phase1/val_task1/val.csv"
     val2_q_csv: str = "Market1501/annotations/phase1/val_task2/val_queries.csv"
