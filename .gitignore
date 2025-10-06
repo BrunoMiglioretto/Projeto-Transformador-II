@@ -217,6 +217,8 @@ __marimo__/
 
 data
 modelos/mobileNet_selectedFeatures
-submission_templates
+data_agumentation/data-balanced-50-50-sample
+data_agumentation/data-oversampling
 
+submission_templates
 submission_templates.zip

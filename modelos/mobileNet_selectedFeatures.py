@@ -32,7 +32,7 @@ class Config:
 
     img_size: int = 224
     batch_size: int = 64
-    epochs: int = 10
+    epochs: int = 5
     lr: float = 3e-4
     weight_decay: float = 1e-4
     num_workers: int = 4
@@ -50,25 +50,14 @@ class Config:
 # Features selecionadas
 # ==========================
 SELECTED_ATTRS = [
-    "Age-Young","Age-Adult","Age-Old",
-    "Gender-Female",
-    "Hair-Length-Short","Hair-Length-Long","Hair-Length-Bald",
+    "LowerBody-Color-Grey",
+    # "LowerBody-Color-Orange",
+    # "LowerBody-Color-Pink","LowerBody-Color-Purple","LowerBody-Color-Red",
+    # "LowerBody-Color-White","LowerBody-Color-Yellow","LowerBody-Color-Other",
+    # "LowerBody-Type-Trousers&Shorts","LowerBody-Type-Skirt&Dress",
 
-    "UpperBody-Length-Short",
-    "UpperBody-Color-Black","UpperBody-Color-Blue","UpperBody-Color-Brown",
-    "UpperBody-Color-Green","UpperBody-Color-Grey","UpperBody-Color-Orange",
-    "UpperBody-Color-Pink","UpperBody-Color-Purple","UpperBody-Color-Red",
-    "UpperBody-Color-White","UpperBody-Color-Yellow","UpperBody-Color-Other",
-
-    "LowerBody-Length-Short",
-    "LowerBody-Color-Black","LowerBody-Color-Blue","LowerBody-Color-Brown",
-    "LowerBody-Color-Green","LowerBody-Color-Grey","LowerBody-Color-Orange",
-    "LowerBody-Color-Pink","LowerBody-Color-Purple","LowerBody-Color-Red",
-    "LowerBody-Color-White","LowerBody-Color-Yellow","LowerBody-Color-Other",
-    "LowerBody-Type-Trousers&Shorts","LowerBody-Type-Skirt&Dress",
-
-    "Accessory-Backpack","Accessory-Bag",
-    "Accessory-Glasses-Normal","Accessory-Glasses-Sun","Accessory-Hat"
+    # "Accessory-Backpack","Accessory-Bag",
+    # "Accessory-Glasses-Normal","Accessory-Glasses-Sun","Accessory-Hat"
 ]
 
 
