@@ -22,8 +22,8 @@ class Config:
     sobre uma amostra aleatória do dataset original.
     """
     # --- CAMINHOS DE ENTRADA ---
-    BASE_PATH = "/mnt/c/Users/gdaud/Desktop/3 - Experiência Criativa Projeto Transformador II - TCC/PROJETO-TCC-WSL/Projeto-Transformador-II/data/"
-    TRAIN_CSV_PATH = os.path.join(BASE_PATH, "Market1501/annotations/phase1/train/train.csv")
+    BASE_PATH = "/home/gdaudt/Área de trabalho/Projeto-Transformador-II/data"
+    TRAIN_CSV_PATH = os.path.join(BASE_PATH, "annotations/phase1/train/train.csv")
 
     # --- DIRETÓRIO PRINCIPAL DE SAÍDA ---
     SAVE_DIR = 'data-balanced-50-50-sample'
@@ -41,7 +41,7 @@ class Config:
     # --- PARÂMETROS DE AMOSTRAGEM ---
     # Defina a porcentagem do dataset a ser processada (ex: 0.05 para 5%).
     # Defina 1.0 para usar o dataset completo.
-    SAMPLE_PERCENTAGE = 0.6
+    SAMPLE_PERCENTAGE = 1.0
     RANDOM_SEED = 42  # Semente para garantir que a amostragem seja sempre a mesma
 
     # --- PARÂMETROS DE AUMENTO ---
@@ -57,7 +57,7 @@ simple_transform = transforms.Compose([
     transforms.RandomResizedCrop(size=(256, 128), scale=(0.8, 1.0)),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-    transforms.RandomGrayscale(p=0.2), # Readicionado para robustez
+    # transforms.RandomGrayscale(p=0.2), # Readicionado para robustez
 ])
 
 # --- TRANSFORMAÇÃO COMPLETA (OPCIONAL) ---

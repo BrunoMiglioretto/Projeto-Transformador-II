@@ -1,10 +1,20 @@
 name: rws-upar-challenge
 channels:
+  - pytorch
+  - nvidia
   - conda-forge
 dependencies:
-  - python
+  - python=3.11
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1
   - tqdm
   - notebook
   - gdown
   - requests
   - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - pillow

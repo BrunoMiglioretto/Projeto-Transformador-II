@@ -18,8 +18,8 @@ class Config:
     Classe para centralizar todas as configurações do script.
     """
     # --- CAMINHOS DE ENTRADA ---
-    BASE_PATH = "/mnt/c/Users/gdaud/Desktop/3 - Experiência Criativa Projeto Transformador II - TCC/PROJETO-TCC-WSL/Projeto-Transformador-II/data/"
-    TRAIN_CSV_PATH = os.path.join(BASE_PATH, "Market1501/annotations/phase1/train/train.csv")
+    BASE_PATH = "/home/gdaudt/Área de trabalho/Projeto-Transformador-II/data"
+    TRAIN_CSV_PATH = os.path.join(BASE_PATH, "annotations/phase1/train/train.csv")
 
     # --- DIRETÓRIO PRINCIPAL DE SAÍDA ---
     # CORREÇÃO: Removido as aspas simples extras e a barra inicial para um caminho mais seguro
@@ -46,7 +46,7 @@ simple_transform = transforms.Compose([
     transforms.RandomResizedCrop(size=(256, 128), scale=(0.8, 1.0)),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-    transforms.RandomGrayscale(p=0.2),
+    # transforms.RandomGrayscale(p=0.2),
 ])
 
 # --- TRANSFORMAÇÃO COMPLETA ---
