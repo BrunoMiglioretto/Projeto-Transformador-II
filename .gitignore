@@ -217,9 +217,10 @@ __marimo__/
 .streamlit/secrets.toml
 
 data
-modelos/mobileNet_selectedFeatures
+modelos/DATASET*
 data_agumentation/data-balanced-50-50-sample
 data_agumentation/data-oversampling
+data_agumentation/generated_balanced_datasets
 
 submission_templates
 submission_templates.zip
