@@ -57,19 +57,19 @@ class Config:
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 64
-    EPOCHS: int = 6
+    EPOCHS: int = 2
     LEARNING_RATE: float = 1e-4
 
     # Parâmetros de Divisão do Dataset
     RANDOM_STATE: int = 42
-    DATA_USAGE_PERCENT: float = 0.05
+    DATA_USAGE_PERCENT: float = 0.009
     TRAIN_SPLIT_SIZE: float = 0.60
     VALIDATION_SPLIT_SIZE: float = 0.20
     TEST_SPLIT_SIZE: float = 0.20
 
     # Dispositivo
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
-
+    
 # ======================================================================================
 # 2. DATASET E DATALOADER
 # ======================================================================================
@@ -109,7 +109,7 @@ def get_transforms(img_size):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]),
-        'val': transforms.Compose([
+        'val_test': transforms.Compose([ # <-- Renomeado para clareza, usado por validação e teste
             transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -228,6 +228,20 @@ def save_average_accuracy_plot(overall_results, save_path):
 # ======================================================================================
 # 6. FUNÇÃO PRINCIPAL
 # ======================================================================================
+
+# <-- NOVA FUNÇÃO AUXILIAR -->
+def get_original_image_path(path_str):
+    """
+    Identifica o nome do arquivo da imagem original, removendo sufixos de aumento de dados.
+    Assume que os arquivos aumentados contêm '_aug_' em seu nome.
+    """
+    if '_aug_' in path_str:
+        base_name, _ = path_str.split('_aug_')
+        # Reconstrói o nome original com a extensão correta
+        original_name = f"{base_name}.jpg" # Adapte a extensão se necessário
+        return original_name
+    return path_str
+
 def main():
     assert np.isclose(Config.TRAIN_SPLIT_SIZE + Config.VALIDATION_SPLIT_SIZE + Config.TEST_SPLIT_SIZE, 1.0), \
         "A soma das porcentagens de divisão (TRAIN, VALIDATION, TEST) deve ser 1.0"
@@ -237,32 +251,56 @@ def main():
     
     df = pd.read_csv(Config.TRAIN_CSV)
     
+    # <-- LÓGICA DE DIVISÃO TOTALMENTE REFEITA -->
     print("\n" + "="*80)
-    print("[INFO] Preparando e dividindo o dataset...")
-    shuffled_df = df.sample(frac=1, random_state=Config.RANDOM_STATE).reset_index(drop=True)
-    num_rows_to_use = int(len(shuffled_df) * Config.DATA_USAGE_PERCENT)
-    subset_df = shuffled_df.iloc[:num_rows_to_use]
-    print(f"[INFO] Total de amostras após shuffle: {len(shuffled_df)}")
-    print(f"[INFO] Usando {Config.DATA_USAGE_PERCENT*100:.1f}% do dataset: {len(subset_df)} amostras.")
+    print("[INFO] Preparando e dividindo o dataset para evitar data leakage...")
+
+    # 1. Identificar a imagem original para cada linha (incluindo as aumentadas)
+    df['original_path'] = df['image_path'].apply(get_original_image_path)
     
-    train_end_idx = int(len(subset_df) * Config.TRAIN_SPLIT_SIZE)
-    validation_end_idx = train_end_idx + int(len(subset_df) * Config.VALIDATION_SPLIT_SIZE)
+    # 2. Obter uma lista de todos os caminhos de imagem originais únicos
+    unique_original_paths = df['original_path'].unique()
     
-    train_df = subset_df.iloc[:train_end_idx]
-    val_df = subset_df.iloc[train_end_idx:validation_end_idx]
-    test_df = subset_df.iloc[validation_end_idx:]
+    # 3. Embaralhar a lista de caminhos originais
+    np.random.seed(Config.RANDOM_STATE)
+    np.random.shuffle(unique_original_paths)
+
+    # 4. Usar uma porcentagem dos identificadores únicos para o experimento
+    num_ids_to_use = int(len(unique_original_paths) * Config.DATA_USAGE_PERCENT)
+    subset_ids = unique_original_paths[:num_ids_to_use]
+    print(f"[INFO] Total de imagens originais únicas: {len(unique_original_paths)}")
+    print(f"[INFO] Usando {Config.DATA_USAGE_PERCENT*100:.1f}% das imagens originais: {len(subset_ids)} IDs únicos.")
+
+    # 5. Dividir os IDENTIFICADORES (não as linhas do DF) em treino, val e teste
+    train_end_idx = int(len(subset_ids) * Config.TRAIN_SPLIT_SIZE)
+    validation_end_idx = train_end_idx + int(len(subset_ids) * Config.VALIDATION_SPLIT_SIZE)
+
+    train_ids = subset_ids[:train_end_idx]
+    val_ids = subset_ids[train_end_idx:validation_end_idx]
+    test_ids = subset_ids[validation_end_idx:]
+
+    # 6. Criar os DataFrames finais baseados nos IDs
+    # O conjunto de treino pode conter originais e aumentadas
+    train_df = df[df['original_path'].isin(train_ids)].copy()
     
-    print(f"[INFO] Divisão final -> Treino: {len(train_df)} | Validação: {len(val_df)} | Teste: {len(test_df)}")
+    # Os conjuntos de validação e teste DEVEM conter APENAS as imagens originais
+    val_df_all = df[df['original_path'].isin(val_ids)]
+    val_df = val_df_all[val_df_all['image_path'] == val_df_all['original_path']].copy()
+
+    test_df_all = df[df['original_path'].isin(test_ids)]
+    test_df = test_df_all[test_df_all['image_path'] == test_df_all['original_path']].copy()
+    
+    print(f"[INFO] Divisão final (IDs): Treino: {len(train_ids)} | Validação: {len(val_ids)} | Teste: {len(test_ids)}")
+    print(f"[INFO] Total de amostras: Treino: {len(train_df)} | Validação: {len(val_df)} | Teste: {len(test_df)}")
     print("="*80)
     
-    feature_cols = [col for col in df.columns if col != 'image_path']
+    feature_cols = [col for col in df.columns if col not in ['image_path', 'original_path']]
     feature_groups = {col: [col] for col in feature_cols}
     print(f"[INFO] Atributos encontrados para treinamento individual: {list(feature_groups.keys())}")
 
     overall_results = {}
     all_feature_performances = []
     
-    # <--- ALTERAÇÃO: Lista para armazenar todos os dados de resumo para o relatório geral --->
     general_summary_list = []
 
     for model_name in Config.MODELS_TO_TRAIN:
@@ -298,9 +336,10 @@ def main():
                 num_classes = 2
 
                 transforms_dict = get_transforms(Config.IMG_SIZE)
+                # TREINO usa augmentations, VAL e TESTE não
                 train_dataset = AttributeDataset(feature_train_df, Config.DATA_ROOT, transforms_dict['train'])
-                val_dataset = AttributeDataset(feature_val_df, Config.DATA_ROOT, transforms_dict['val'])
-                test_dataset = AttributeDataset(feature_test_df, Config.DATA_ROOT, transforms_dict['val'])
+                val_dataset = AttributeDataset(feature_val_df, Config.DATA_ROOT, transforms_dict['val_test'])
+                test_dataset = AttributeDataset(feature_test_df, Config.DATA_ROOT, transforms_dict['val_test'])
 
                 train_loader = DataLoader(train_dataset, batch_size=Config.BATCH_SIZE, shuffle=True, num_workers=2, collate_fn=collate_fn)
                 val_loader = DataLoader(val_dataset, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=2, collate_fn=collate_fn)
@@ -385,7 +424,6 @@ def main():
                 summary_df.to_csv(summary_csv_path, index=False)
                 print(f"\n[INFO] Relatório de resumo do modelo salvo em: {summary_csv_path}")
                 
-                # <--- ALTERAÇÃO: Adiciona os dados de resumo do modelo à lista geral --->
                 general_summary_list.extend(model_summary_data)
 
             print("\n" + "-"*80)
@@ -432,14 +470,12 @@ def main():
         performance_df_sorted.to_csv(csv_path, index=False)
         print(f"[INFO] Relatório de performance final salvo em: {csv_path}")
 
-    # <--- ALTERAÇÃO: Cria e salva o relatório de resumo geral --->
     if general_summary_list:
         general_summary_df = pd.DataFrame(general_summary_list)
         general_summary_df = general_summary_df.round({'accuracy': 3, 'f1_score': 3, 'precision': 3, 'recall': 3})
         general_csv_path = os.path.join(Config.OUTPUT_DIR, 'general_summary_report.csv')
         general_summary_df.to_csv(general_csv_path, index=False)
         print(f"[INFO] Relatório de resumo geral salvo em: {general_csv_path}")
-
 
 if __name__ == '__main__':
     main()
