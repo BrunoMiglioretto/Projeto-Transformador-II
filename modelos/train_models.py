@@ -57,12 +57,12 @@ class Config:
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 64
-    EPOCHS: int = 2
+    EPOCHS: int = 6
     LEARNING_RATE: float = 1e-4
 
     # Parâmetros de Divisão do Dataset
     RANDOM_STATE: int = 42
-    DATA_USAGE_PERCENT: float = 0.009
+    DATA_USAGE_PERCENT: float = 0.05
     TRAIN_SPLIT_SIZE: float = 0.60
     VALIDATION_SPLIT_SIZE: float = 0.20
     TEST_SPLIT_SIZE: float = 0.20
@@ -109,7 +109,7 @@ def get_transforms(img_size):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]),
-        'val_test': transforms.Compose([ # <-- Renomeado para clareza, usado por validação e teste
+        'val_test': transforms.Compose([
             transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -202,7 +202,7 @@ def save_accuracy_plot(train_acc, val_acc, save_path, title='Acurácia por Époc
 
 def save_confusion_matrix(y_true, y_pred, class_names, save_path, title='Matriz de Confusão'):
     if not y_true or not y_pred: return
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.title(title)
@@ -228,8 +228,6 @@ def save_average_accuracy_plot(overall_results, save_path):
 # ======================================================================================
 # 6. FUNÇÃO PRINCIPAL
 # ======================================================================================
-
-# <-- NOVA FUNÇÃO AUXILIAR -->
 def get_original_image_path(path_str):
     """
     Identifica o nome do arquivo da imagem original, removendo sufixos de aumento de dados.
@@ -237,8 +235,7 @@ def get_original_image_path(path_str):
     """
     if '_aug_' in path_str:
         base_name, _ = path_str.split('_aug_')
-        # Reconstrói o nome original com a extensão correta
-        original_name = f"{base_name}.jpg" # Adapte a extensão se necessário
+        original_name = f"{base_name}.jpg"
         return original_name
     return path_str
 
@@ -251,27 +248,25 @@ def main():
     
     df = pd.read_csv(Config.TRAIN_CSV)
     
-    # <-- LÓGICA DE DIVISÃO TOTALMENTE REFEITA -->
+    # --- LÓGICA DE DIVISÃO DE DADOS ROBUSTA E CORRIGIDA ---
     print("\n" + "="*80)
-    print("[INFO] Preparando e dividindo o dataset para evitar data leakage...")
+    print("[INFO] Análise inicial do Dataset...")
+    print(f"[INFO] Total de linhas no CSV (originais + aumentadas): {len(df)}")
 
-    # 1. Identificar a imagem original para cada linha (incluindo as aumentadas)
     df['original_path'] = df['image_path'].apply(get_original_image_path)
-    
-    # 2. Obter uma lista de todos os caminhos de imagem originais únicos
     unique_original_paths = df['original_path'].unique()
+    print(f"[INFO] Total de imagens originais únicas encontradas: {len(unique_original_paths)}")
+    print("="*80)
+
+    print("[INFO] Preparando e dividindo o dataset para evitar data leakage...")
     
-    # 3. Embaralhar a lista de caminhos originais
     np.random.seed(Config.RANDOM_STATE)
     np.random.shuffle(unique_original_paths)
 
-    # 4. Usar uma porcentagem dos identificadores únicos para o experimento
     num_ids_to_use = int(len(unique_original_paths) * Config.DATA_USAGE_PERCENT)
     subset_ids = unique_original_paths[:num_ids_to_use]
-    print(f"[INFO] Total de imagens originais únicas: {len(unique_original_paths)}")
     print(f"[INFO] Usando {Config.DATA_USAGE_PERCENT*100:.1f}% das imagens originais: {len(subset_ids)} IDs únicos.")
 
-    # 5. Dividir os IDENTIFICADORES (não as linhas do DF) em treino, val e teste
     train_end_idx = int(len(subset_ids) * Config.TRAIN_SPLIT_SIZE)
     validation_end_idx = train_end_idx + int(len(subset_ids) * Config.VALIDATION_SPLIT_SIZE)
 
@@ -279,16 +274,11 @@ def main():
     val_ids = subset_ids[train_end_idx:validation_end_idx]
     test_ids = subset_ids[validation_end_idx:]
 
-    # 6. Criar os DataFrames finais baseados nos IDs
-    # O conjunto de treino pode conter originais e aumentadas
+    # LÓGICA FINAL: Todos os conjuntos incluem as imagens originais e suas variações.
+    # A garantia contra data leakage é mantida pela divisão dos IDs.
     train_df = df[df['original_path'].isin(train_ids)].copy()
-    
-    # Os conjuntos de validação e teste DEVEM conter APENAS as imagens originais
-    val_df_all = df[df['original_path'].isin(val_ids)]
-    val_df = val_df_all[val_df_all['image_path'] == val_df_all['original_path']].copy()
-
-    test_df_all = df[df['original_path'].isin(test_ids)]
-    test_df = test_df_all[test_df_all['image_path'] == test_df_all['original_path']].copy()
+    val_df = df[df['original_path'].isin(val_ids)].copy()
+    test_df = df[df['original_path'].isin(test_ids)].copy()
     
     print(f"[INFO] Divisão final (IDs): Treino: {len(train_ids)} | Validação: {len(val_ids)} | Teste: {len(test_ids)}")
     print(f"[INFO] Total de amostras: Treino: {len(train_df)} | Validação: {len(val_df)} | Teste: {len(test_df)}")
@@ -336,14 +326,13 @@ def main():
                 num_classes = 2
 
                 transforms_dict = get_transforms(Config.IMG_SIZE)
-                # TREINO usa augmentations, VAL e TESTE não
                 train_dataset = AttributeDataset(feature_train_df, Config.DATA_ROOT, transforms_dict['train'])
                 val_dataset = AttributeDataset(feature_val_df, Config.DATA_ROOT, transforms_dict['val_test'])
                 test_dataset = AttributeDataset(feature_test_df, Config.DATA_ROOT, transforms_dict['val_test'])
 
-                train_loader = DataLoader(train_dataset, batch_size=Config.BATCH_SIZE, shuffle=True, num_workers=2, collate_fn=collate_fn)
-                val_loader = DataLoader(val_dataset, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=2, collate_fn=collate_fn)
-                test_loader = DataLoader(test_dataset, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=2, collate_fn=collate_fn)
+                train_loader = DataLoader(train_dataset, batch_size=Config.BATCH_SIZE, shuffle=True, num_workers=4, collate_fn=collate_fn, pin_memory=True)
+                val_loader = DataLoader(val_dataset, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4, collate_fn=collate_fn, pin_memory=True)
+                test_loader = DataLoader(test_dataset, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4, collate_fn=collate_fn, pin_memory=True)
 
                 model = get_model(model_name, num_classes).to(Config.DEVICE)
                 criterion = nn.CrossEntropyLoss()
@@ -359,8 +348,8 @@ def main():
                     print(f"\nÉpoca {epoch + 1}/{Config.EPOCHS}")
                     train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, Config.DEVICE)
                     val_loss, val_acc, _, _ = evaluate(model, val_loader, criterion, Config.DEVICE)
-                    print(f"Treino -> Perda: {train_loss:.3f}, Acurácia: {train_acc:.3f}")
-                    print(f"Validação -> Perda: {val_loss:.3f}, Acurácia: {val_acc:.3f}")
+                    print(f"Treino -> Perda: {train_loss:.4f}, Acurácia: {train_acc:.4f}")
+                    print(f"Validação -> Perda: {val_loss:.4f}, Acurácia: {val_acc:.4f}")
                     train_acc_history.append(train_acc)
                     val_acc_history.append(val_acc)
                     if val_acc > best_val_acc:
@@ -370,7 +359,7 @@ def main():
                 save_accuracy_plot(train_acc_history, val_acc_history, os.path.join(feature_output_dir, 'accuracy_plot.png'))
                 
                 print("\n[INFO] Avaliando no conjunto de teste...")
-                model.load_state_dict(torch.load(os.path.join(feature_output_dir, 'best_model.pth')))
+                model.load_state_dict(torch.load(os.path.join(feature_output_dir, 'best_model.pth'), weights_only=True))
                 _, test_acc, y_pred, y_true = evaluate(model, test_loader, criterion, Config.DEVICE)
                 
                 model_all_true_labels.extend(y_true)
@@ -381,19 +370,19 @@ def main():
                 precision = precision_score(y_true, y_pred, average='weighted', zero_division=0)
                 recall = recall_score(y_true, y_pred, average='weighted', zero_division=0)
                 
-                print(f"Acurácia (mACC) no Teste: {macc:.3f}")
+                print(f"Acurácia (mACC) no Teste: {macc:.4f}")
                 
-                report_for_log = classification_report(y_true, y_pred, target_names=class_names, zero_division=0)
+                report_for_log = classification_report(y_true, y_pred, target_names=class_names, labels=[0, 1], zero_division=0)
                 print(report_for_log)
                 
-                report_for_csv = classification_report(y_true, y_pred, target_names=class_names, zero_division=0, output_dict=True)
+                report_for_csv = classification_report(y_true, y_pred, target_names=class_names, labels=[0, 1], zero_division=0, output_dict=True)
                 report_df = pd.DataFrame(report_for_csv).transpose()
                 
                 float_cols = ['precision', 'recall', 'f1-score', 'support']
                 for col in float_cols:
                     if col in report_df.columns:
                         report_df[col] = pd.to_numeric(report_df[col], errors='coerce')
-                report_df = report_df.round(3)
+                report_df = report_df.round(4)
 
                 csv_report_path = os.path.join(feature_output_dir, 'classification_report.csv')
                 report_df.to_csv(csv_report_path)
@@ -401,13 +390,8 @@ def main():
                 save_confusion_matrix(y_true, y_pred, class_names, os.path.join(feature_output_dir, 'confusion_matrix.png'))
                 
                 model_summary_data.append({
-                    "model_name": model_name,
-                    "attribute": feature,
-                    "accuracy": macc,
-                    "f1_score": f1,
-                    "precision": precision,
-                    "recall": recall,
-                    "dataset": Config.DATASET_NAME
+                    "model_name": model_name, "attribute": feature, "accuracy": macc, "f1_score": f1,
+                    "precision": precision, "recall": recall, "dataset": Config.DATASET_NAME
                 })
                 
                 all_feature_performances.append({
@@ -419,7 +403,7 @@ def main():
 
             if model_summary_data:
                 summary_df = pd.DataFrame(model_summary_data)
-                summary_df = summary_df.round({'accuracy': 3, 'f1_score': 3, 'precision': 3, 'recall': 3})
+                summary_df = summary_df.round(4)
                 summary_csv_path = os.path.join(model_output_dir, f'{model_name}_summary_report.csv')
                 summary_df.to_csv(summary_csv_path, index=False)
                 print(f"\n[INFO] Relatório de resumo do modelo salvo em: {summary_csv_path}")
@@ -431,8 +415,8 @@ def main():
             print("-" * 80)
             general_macc = accuracy_score(model_all_true_labels, model_all_pred_labels)
             general_f1 = f1_score(model_all_true_labels, model_all_pred_labels, average='weighted', zero_division=0)
-            print(f"  - mACC Geral (todas as features): {general_macc:.3f}")
-            print(f"  - F1-Score Ponderado Geral: {general_f1:.3f}")
+            print(f"  - mACC Geral (todas as features): {general_macc:.4f}")
+            print(f"  - F1-Score Ponderado Geral: {general_f1:.4f}")
             save_confusion_matrix(model_all_true_labels, model_all_pred_labels, 
                                   class_names=['Não Presente', 'Presente'], 
                                   save_path=os.path.join(model_output_dir, 'general_confusion_matrix.png'),
@@ -464,7 +448,7 @@ def main():
         save_average_accuracy_plot(overall_results, os.path.join(Config.OUTPUT_DIR, 'average_accuracy_comparison.png'))
     if all_feature_performances:
         performance_df = pd.DataFrame(all_feature_performances)
-        performance_df = performance_df.round({'train_acc': 3, 'val_acc': 3, 'test_acc': 3})
+        performance_df = performance_df.round(4)
         performance_df_sorted = performance_df.sort_values(by="test_acc", ascending=False)
         csv_path = os.path.join(Config.OUTPUT_DIR, 'final_performance_report.csv')
         performance_df_sorted.to_csv(csv_path, index=False)
@@ -472,7 +456,7 @@ def main():
 
     if general_summary_list:
         general_summary_df = pd.DataFrame(general_summary_list)
-        general_summary_df = general_summary_df.round({'accuracy': 3, 'f1_score': 3, 'precision': 3, 'recall': 3})
+        general_summary_df = general_summary_df.round(4)
         general_csv_path = os.path.join(Config.OUTPUT_DIR, 'general_summary_report.csv')
         general_summary_df.to_csv(general_csv_path, index=False)
         print(f"[INFO] Relatório de resumo geral salvo em: {general_csv_path}")
