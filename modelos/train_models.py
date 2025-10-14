@@ -62,7 +62,7 @@ class Config:
 
     # Parâmetros de Divisão do Dataset
     RANDOM_STATE: int = 42
-    DATA_USAGE_PERCENT: float = 0.40
+    DATA_USAGE_PERCENT: float = 0.05
     TRAIN_SPLIT_SIZE: float = 0.60
     VALIDATION_SPLIT_SIZE: float = 0.20
     TEST_SPLIT_SIZE: float = 0.20
