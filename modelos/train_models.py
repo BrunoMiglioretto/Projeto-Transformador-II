@@ -57,7 +57,7 @@ class Config:
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 32
-    EPOCHS: int = 1
+    EPOCHS: int = 6
     LEARNING_RATE: float = 1e-4
 
     # Parâmetros de Divisão do Dataset
