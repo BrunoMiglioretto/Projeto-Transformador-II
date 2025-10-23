@@ -65,8 +65,8 @@ class Config:
     # Parâmetros de Treinamento
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0', 'SwinV2-T']
     IMG_SIZE: int = 200
-    BATCH_SIZE: int = 64
-    EPOCHS: int = 10
+    BATCH_SIZE: int = 32
+    EPOCHS: int = 6
     LEARNING_RATE: float = 1e-4
 
     # === PARÂMETROS DE DIVISÃO (RE-ADICIONADOS) ===
