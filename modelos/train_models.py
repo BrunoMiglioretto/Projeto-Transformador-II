@@ -59,10 +59,16 @@ class Config:
     # Arquivo .txt único que será dividido em Validação e Teste
     VAL_TEST_TXT: str = os.path.join(DATA_ROOT, "validation_set.txt")
     
-    OUTPUT_DIR: str = "./output-com_transfer_leaning"
+    # O OUTPUT_DIR será definido dinamicamente abaixo, fora da classe
     DATASET_NAME: str = os.path.basename(DATA_ROOT)
 
     # Parâmetros de Treinamento
+    
+    # === OPÇÃO DE TRANSFER LEARNING ADICIONADA ===
+    # Mude para False para treinar do zero (sem transfer learning)
+    USE_PRETRAINED: bool = False
+    # ============================================
+
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0', 'SwinV2-T']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 32
@@ -76,6 +82,12 @@ class Config:
     # Dispositivo
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
     
+# --- AJUSTE: DEFINIÇÃO DINÂMICA DO OUTPUT_DIR ---
+# Define o nome da pasta de saída com base na opção USE_PRETRAINED
+transfer_status = 'com_transfer_learning' if Config.USE_PRETRAINED else 'sem_transfer_learning'
+Config.OUTPUT_DIR = f"./output-{transfer_status}"
+# ------------------------------------------------
+
 # ======================================================================================
 # 2. DATASET E DATALOADER
 # ======================================================================================
@@ -128,10 +140,18 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 # ======================================================================================
-# 3. MODELOS
+# 3. MODELOS (MODIFICADO)
 # ======================================================================================
-def get_model(model_name: str, num_classes: int, pretrained: bool = True):
-    weights = 'DEFAULT' if pretrained else None
+def get_model(model_name: str, num_classes: int):
+    """
+    Carrega um modelo.
+    Lê Config.USE_PRETRAINED para decidir se carrega pesos pré-treinados.
+    """
+    
+    # === AJUSTE: Lê a flag da classe Config ===
+    weights = 'DEFAULT' if Config.USE_PRETRAINED else None
+    # =========================================
+    
     if model_name == 'MobileNetV2':
         model = models.mobilenet_v2(weights=weights)
         num_ftrs = model.classifier[1].in_features
@@ -246,6 +266,9 @@ def save_confusion_matrix(y_true, y_pred, class_names, save_path, title='Matriz 
 
 def main():
     print(f"[INFO] Usando dispositivo: {Config.DEVICE}")
+    
+    # === MODIFICADO: OUTPUT_DIR agora é lido da Config já formatado ===
+    print(f"[INFO] Diretório de saída: {Config.OUTPUT_DIR}")
     os.makedirs(Config.OUTPUT_DIR, exist_ok=True)
     
     # --- LÓGICA DE DADOS AJUSTADA PARA DIVIDIR VAL_TEST_TXT ---
@@ -266,14 +289,14 @@ def main():
         # Carrega o TXT de treino SEM cabeçalho
         train_df = pd.read_csv(
             Config.TRAIN_TXT, 
-            header=None,        
+            header=None,       
             names=column_names  
         ) 
         
         # Carrega o TXT de Val/Teste SEM cabeçalho
         val_test_df = pd.read_csv(
             Config.VAL_TEST_TXT, 
-            header=None,        
+            header=None,       
             names=column_names  
         )
         
@@ -338,6 +361,7 @@ def main():
         is_color_feature = feature in ['upper_color', 'lower_color']
         
         if is_color_feature:
+            # Ajusta labels 1-11 para 0-10
             feature_train_df['label'] = feature_train_df['label'] - 1
             feature_val_df['label'] = feature_val_df['label'] - 1
             feature_test_df['label'] = feature_test_df['label'] - 1
@@ -353,7 +377,7 @@ def main():
             class_names = [f'Not_{feature}', feature]
             report_labels = [0, 1]
             print(f"[INFO] Atributo BINÁRIO detectado. Num classes: {num_classes}")
-             
+                 
         # 2. Preparar DataLoaders para este atributo
         train_img_dir = os.path.join(Config.DATA_ROOT, 'training_set')
         val_img_dir = os.path.join(Config.DATA_ROOT, 'validation_set')
@@ -384,10 +408,18 @@ def main():
             try:
                 print("\n" + "="*80)
                 print(f"[INFO] Treinando modelo: {model_name} para o atributo: {feature} (Classes: {num_classes})")
+                
+                # === MODIFICAÇÃO: Informa o status do Transfer Learning ===
+                print(f"[INFO] Transfer Learning (Pesos Pré-treinados): {Config.USE_PRETRAINED}")
+                # ========================================================
+                
                 print(f"[INFO] A saída está sendo salva em: {log_file_path}")
                 print("="*80)
-
+                
+                # === MODIFICAÇÃO: Chamada do modelo simplificada ===
                 model = get_model(model_name, num_classes).to(Config.DEVICE)
+                # ==================================================
+                
                 criterion = nn.CrossEntropyLoss()
                 optimizer = optim.Adam(model.parameters(), lr=Config.LEARNING_RATE)
 
