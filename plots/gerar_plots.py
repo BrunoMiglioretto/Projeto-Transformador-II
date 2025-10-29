@@ -106,7 +106,8 @@ def main(train_path, test_path):
                 fig1.suptitle(f'Distribuição (Gender, Bag, Hat) - {label}', fontsize=18)
                 fig1.tight_layout(rect=[0, 0.03, 1, 0.95])
                 
-                img_file1 = f"{label.lower()}_gbh_distribution.png"
+                # *** AJUSTE AQUI ***
+                img_file1 = f"PAR2025_{label.lower()}_gbh_distribution.png"
                 fig1.savefig(img_file1)
                 plt.close(fig1) 
                 generated_images.append(img_file1)
@@ -131,7 +132,8 @@ def main(train_path, test_path):
                 fig2.suptitle(f'Distribuição (Upper Color, Lower Color) - {label}', fontsize=18)
                 fig2.tight_layout(rect=[0, 0.03, 1, 0.95])
                 
-                img_file2 = f"{label.lower()}_colors_distribution.png"
+                # *** AJUSTE AQUI ***
+                img_file2 = f"PAR2025_{label.lower()}_colors_distribution.png"
                 fig2.savefig(img_file2)
                 plt.close(fig2) 
                 generated_images.append(img_file2)
