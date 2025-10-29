@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
 import os
 import pandas as pd
 import numpy as np
-import time  # <--- ADICIONADO
+import time
 from collections import defaultdict
 from PIL import Image
 import sys
@@ -12,15 +13,15 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
 from torchvision.transforms import v2
+import argparse  # <-- IMPORTADO
+import warnings
 
-# Ajustado para incluir train_test_split para a nova divisão
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, f1_score, precision_score, recall_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
-import warnings
-from scipy import stats  # Importado para Hard Voting (stats.mode)
+from scipy import stats
 
 # Ignorar avisos de convergência do Scikit-learn para relatórios mais limpos
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -45,57 +46,45 @@ class Logger:
         self.log.close()
 
 # ======================================================================================
-# 1. CLASSE DE CONFIGURAÇÃO (AJUSTADA)
+# 1. CLASSE DE CONFIGURAÇÃO (AGORA USADA PARA VALORES PADRÃO)
 # ======================================================================================
 class Config:
     """
     Classe de configuração para todos os hiperparâmetros e caminhos.
+    Estes são os valores PADRÃO e podem ser sobrescritos por args de linha de comando.
     """
     # Caminhos
     DATA_ROOT: str = "/home/gdaudt/Área de trabalho/Projeto-Transformador-II/data/PAR2025"
-    
-    # === CAMINHOS DE ARQUIVOS TXT AJUSTADOS ===
-    # Arquivo .txt para treino
     TRAIN_TXT: str = os.path.join(DATA_ROOT, "training_set.txt")
-    # Arquivo .txt único que será dividido em Validação e Teste
     VAL_TEST_TXT: str = os.path.join(DATA_ROOT, "validation_set.txt")
     
-    # O OUTPUT_DIR será definido dinamicamente abaixo, fora da classe
+    # OUTPUT_DIR será definido dinamicamente dentro de main()
+    OUTPUT_DIR: str = "" 
     DATASET_NAME: str = os.path.basename(DATA_ROOT)
 
     # Parâmetros de Treinamento
-    
-    # === OPÇÃO DE TRANSFER LEARNING ADICIONADA ===
-    # Mude para False para treinar do zero (sem transfer learning)
-    USE_PRETRAINED: bool = False
-    # ============================================
-
+    USE_PRETRAINED: bool = True
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0', 'SwinV2-T']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 32
     EPOCHS: int = 10
     LEARNING_RATE: float = 1e-4
 
-    # === PARÂMETROS DE DIVISÃO (RE-ADICIONADOS) ===
+    # Parâmetros de Divisão
     VAL_SPLIT_FOR_TEST: float = 0.5 
     RANDOM_STATE: int = 42 
 
     # Dispositivo
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
     
-# --- AJUSTE: DEFINIÇÃO DINÂMICA DO OUTPUT_DIR ---
-# Define o nome da pasta de saída com base na opção USE_PRETRAINED
-transfer_status = 'com_transfer_learning' if Config.USE_PRETRAINED else 'sem_transfer_learning'
-Config.OUTPUT_DIR = f"./output-{transfer_status}-DataAgumentationDuranteTreinamento"
-# ------------------------------------------------
+# --- A definição dinâmica do OUTPUT_DIR foi movida para dentro de main() ---
 
 # ======================================================================================
-# 2. DATASET E DATALOADER
+# 2. DATASET E DATALOADER (Sem alterações)
 # ======================================================================================
 class AttributeDataset(Dataset):
     def __init__(self, df, data_root, transform=None):
         self.df = df
-        # data_root agora será o caminho específico (ex: .../PAR2025/training_set)
         self.data_root = data_root 
         self.transform = transform
         self.image_paths = df['image_path'].values
@@ -105,12 +94,10 @@ class AttributeDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, idx):
-        # Caminho da imagem é relativo ao DATA_ROOT (que agora é a pasta correta)
         img_path = os.path.join(self.data_root, self.image_paths[idx])
         try:
             image = Image.open(img_path).convert("RGB")
         except FileNotFoundError:
-            # print(f"Warning: File not found {img_path}. Skipping.") # Removido para poluir menos
             return None, None
             
         label = torch.tensor(self.labels[idx], dtype=torch.long)
@@ -123,28 +110,10 @@ class AttributeDataset(Dataset):
 def get_transforms(img_size):
     return {
         'train': transforms.Compose([
-            # 1. Lida com zoom e posição de forma eficiente.
-            # É a transformação padrão-ouro para classificação.
-            # Usamos uma escala conservadora (0.8 a 1.0) para manter
-            # a maior parte do pedestre na imagem.
             transforms.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
-            
-            # 2. A transformação geométrica mais importante para pedestres.
             transforms.RandomHorizontalFlip(p=0.5),
-            
-            # --- NÃO ADICIONE NENHUMA TRANSFORMAÇÃO DE COR ---
-            # (Como ColorJitter, Grayscale, ou mesmo Autocontrast)
-            
-            # 3. Converter para Tensor
             transforms.ToTensor(),
-            
-            # 4. Normalizar (padrão ImageNet)
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            
-            # 5. (Opcional, mas muito eficiente) Random Erasing
-            # Simula oclusão (ex: um poste, uma bolsa, outra pessoa na frente).
-            # Isso força o modelo a olhar para todas as partes do corpo
-            # para reconhecer os atributos.
             transforms.RandomErasing(p=0.4, scale=(0.02, 0.2), ratio=(0.3, 3.3), value=0),
         ]),
         'val_test': transforms.Compose([
@@ -161,17 +130,14 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 # ======================================================================================
-# 3. MODELOS (MODIFICADO)
+# 3. MODELOS (Sem alterações)
 # ======================================================================================
 def get_model(model_name: str, num_classes: int):
     """
     Carrega um modelo.
     Lê Config.USE_PRETRAINED para decidir se carrega pesos pré-treinados.
     """
-    
-    # === AJUSTE: Lê a flag da classe Config ===
     weights = 'DEFAULT' if Config.USE_PRETRAINED else None
-    # =========================================
     
     if model_name == 'MobileNetV2':
         model = models.mobilenet_v2(weights=weights)
@@ -188,7 +154,7 @@ def get_model(model_name: str, num_classes: int):
     return model
 
 # ======================================================================================
-# 4. FUNÇÕES DE TREINAMENTO E AVALIAÇÃO
+# 4. FUNÇÕES DE TREINAMENTO E AVALIAÇÃO (Sem alterações)
 # ======================================================================================
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
     model.train()
@@ -233,14 +199,10 @@ def evaluate(model, dataloader, criterion, device):
     return epoch_loss, epoch_acc.item() if isinstance(epoch_acc, torch.Tensor) else epoch_acc, all_preds, all_labels, np.array(all_probs)
 
 # ======================================================================================
-# 5. UTILITÁRIOS (PLOTS, SALVAMENTO E SPLIT)
+# 5. UTILITÁRIOS (PLOTS, SALVAMENTO E SPLIT) (Sem alterações)
 # ======================================================================================
 
 def get_original_image_path(path_str):
-    """
-    Identifica o nome do arquivo da imagem original, removendo sufixos de aumento de dados.
-    Assume que os arquivos aumentados contêm '_aug_' em seu nome.
-    """
     if '_aug_' in path_str:
         base_name = path_str.split('_aug_')[0]
         original_name = f"{base_name}.jpg" 
@@ -263,7 +225,6 @@ def save_accuracy_plot(train_acc, val_acc, save_path, title='Acurácia por Époc
 def save_confusion_matrix(y_true, y_pred, class_names, save_path, title='Matriz de Confusão'):
     if not y_true or not y_pred: return
     
-    # Lida com o caso de ser multiclasse ou binário para a CM
     labels_present = sorted(list(np.unique(y_true + y_pred)))
     if 0 not in labels_present: labels_present = [0] + labels_present
     if 1 not in labels_present and len(labels_present) < 3 : labels_present = labels_present + [1]
@@ -271,7 +232,6 @@ def save_confusion_matrix(y_true, y_pred, class_names, save_path, title='Matriz 
     cm = confusion_matrix(y_true, y_pred, labels=labels_present)
     plt.figure(figsize=(10, 8))
     
-    # Ajusta os nomes das classes se for binário
     display_names = class_names if len(labels_present) <= 2 else labels_present
     
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=display_names, yticklabels=display_names)
@@ -286,44 +246,35 @@ def save_confusion_matrix(y_true, y_pred, class_names, save_path, title='Matriz 
 # ======================================================================================
 
 def main():
+    # === AJUSTE: DEFINIÇÃO DINÂMICA DO OUTPUT_DIR MOVIDA PARA CÁ ===
+    # Agora o OUTPUT_DIR é definido com base no Config.USE_PRETRAINED,
+    # que foi atualizado pelos argumentos da linha de comando.
+    transfer_status = 'com_transfer_learning' if Config.USE_PRETRAINED else 'sem_transfer_learning'
+    Config.OUTPUT_DIR = f"./output-{transfer_status}-DataAgumentationDuranteTreinamento"
+    # ------------------------------------------------
+
     print(f"[INFO] Usando dispositivo: {Config.DEVICE}")
-    
-    # === MODIFICADO: OUTPUT_DIR agora é lido da Config já formatado ===
     print(f"[INFO] Diretório de saída: {Config.OUTPUT_DIR}")
     os.makedirs(Config.OUTPUT_DIR, exist_ok=True)
     
-    # --- LÓGICA DE DADOS AJUSTADA PARA DIVIDIR VAL_TEST_TXT ---
     print("\n" + "="*80)
     print("[INFO] Carregando arquivos TXT...")
     
-    # Defina os nomes das colunas, pois os arquivos TXT não têm cabeçalho.
     column_names = [
-        'image_path', 
-        'upper_color', 
-        'lower_color', 
-        'gender', 
-        'bag', 
-        'hat'
+        'image_path', 'upper_color', 'lower_color', 'gender', 'bag', 'hat'
     ]
 
     try:
-        # Carrega o TXT de treino SEM cabeçalho
         train_df = pd.read_csv(
-            Config.TRAIN_TXT, 
-            header=None,       
-            names=column_names  
+            Config.TRAIN_TXT, header=None, names=column_names
         ) 
-        
-        # Carrega o TXT de Val/Teste SEM cabeçalho
         val_test_df = pd.read_csv(
-            Config.VAL_TEST_TXT, 
-            header=None,       
-            names=column_names  
+            Config.VAL_TEST_TXT, header=None, names=column_names
         )
         
     except FileNotFoundError as e:
         print(f"[ERRO] Arquivo TXT não encontrado: {e}")
-        print(f"Por favor, verifique os caminhos em Config:")
+        print(f"Por favor, verifique os caminhos:")
         print(f"  TRAIN_TXT: {Config.TRAIN_TXT}")
         print(f"  VAL_TEST_TXT: {Config.VAL_TEST_TXT}")
         return
@@ -335,7 +286,6 @@ def main():
     print(f"[INFO] Total de amostras de Treino (bruto): {len(train_df)}")
     print(f"[INFO] Total de amostras de Val/Teste (bruto): {len(val_test_df)}")
     
-    # --- LÓGICA DE DIVISÃO ROBUSTA (ANTI-DATA LEAKAGE) ---
     print("[INFO] Preparando e dividindo o dataset de Val/Teste...")
 
     val_test_df['original_path'] = val_test_df['image_path'].apply(get_original_image_path)
@@ -351,7 +301,6 @@ def main():
     val_df = val_test_df[val_test_df['original_path'].isin(val_ids)].copy()
     test_df = val_test_df[val_test_df['original_path'].isin(test_ids)].copy()
 
-    # Adiciona a coluna 'original_path' ao train_df também
     train_df['original_path'] = train_df['image_path'].apply(get_original_image_path)
 
     print(f"[INFO] Divisão final (IDs): Validação: {len(val_ids)} | Teste: {len(test_ids)}")
@@ -370,36 +319,29 @@ def main():
         print(f"[INFO] Iniciando processamento para o atributo: {feature}")
         print(f"{'='*80}")
 
-        # 1. Preparar DataFrames para este atributo
         feature_train_df = train_df[['image_path', feature]].copy().rename(columns={feature: 'label'})
         feature_val_df = val_df[['image_path', feature]].copy().rename(columns={feature: 'label'})
         feature_test_df = test_df[['image_path', feature]].copy().rename(columns={feature: 'label'})
 
-        # --- Lógica de Classes (AJUSTADA para multiclasse) ---
         all_labels = pd.concat([feature_train_df['label'], feature_val_df['label'], feature_test_df['label']])
         unique_labels = sorted(all_labels.unique())
         
         is_color_feature = feature in ['upper_color', 'lower_color']
         
         if is_color_feature:
-            # Ajusta labels 1-11 para 0-10
             feature_train_df['label'] = feature_train_df['label'] - 1
             feature_val_df['label'] = feature_val_df['label'] - 1
             feature_test_df['label'] = feature_test_df['label'] - 1
-            
-            num_classes = 11 # 11 classes (índices 0-10)
-            class_names = [str(i) for i in range(1, 12)] # Nomes 1 a 11
-            report_labels = list(range(11)) # Labels para o relatório 0 a 10
-            
+            num_classes = 11
+            class_names = [str(i) for i in range(1, 12)]
+            report_labels = list(range(11))
             print(f"[INFO] Atributo de COR detectado. Labels ajustados de 1-11 para 0-10 Para CrossEntropyLoss. Num classes: {num_classes}")
-            
         else: # gender, bag, hat
             num_classes = 2
             class_names = [f'Not_{feature}', feature]
             report_labels = [0, 1]
             print(f"[INFO] Atributo BINÁRIO detectado. Num classes: {num_classes}")
                  
-        # 2. Preparar DataLoaders para este atributo
         train_img_dir = os.path.join(Config.DATA_ROOT, 'training_set')
         val_img_dir = os.path.join(Config.DATA_ROOT, 'validation_set')
         test_img_dir = val_img_dir 
@@ -416,7 +358,6 @@ def main():
         
         feature_test_results = {'preds': {}, 'probs': {}, 'labels': None}
 
-        # === LOOP SECUNDÁRIO: TREINAR TODOS OS MODELOS PARA ESTE ATRIBUTO ===
         for model_name in Config.MODELS_TO_TRAIN:
             
             feature_output_dir = os.path.join(Config.OUTPUT_DIR, feature.replace('&','_'), model_name)
@@ -429,18 +370,11 @@ def main():
             try:
                 print("\n" + "="*80)
                 print(f"[INFO] Treinando modelo: {model_name} para o atributo: {feature} (Classes: {num_classes})")
-                
-                # === MODIFICAÇÃO: Informa o status do Transfer Learning ===
                 print(f"[INFO] Transfer Learning (Pesos Pré-treinados): {Config.USE_PRETRAINED}")
-                # ========================================================
-                
                 print(f"[INFO] A saída está sendo salva em: {log_file_path}")
                 print("="*80)
                 
-                # === MODIFICAÇÃO: Chamada do modelo simplificada ===
                 model = get_model(model_name, num_classes).to(Config.DEVICE)
-                # ==================================================
-                
                 criterion = nn.CrossEntropyLoss()
                 optimizer = optim.Adam(model.parameters(), lr=Config.LEARNING_RATE)
 
@@ -448,11 +382,6 @@ def main():
                 best_val_acc = 0.0
                 best_model_path = os.path.join(feature_output_dir, 'best_model.pth')
 
-                # 3. Loop de Treinamento
-                
-                # ==================================================================
-                # === INÍCIO DA MEDIÇÃO DE TEMPO ===
-                # ==================================================================
                 start_time = time.time()
                 
                 for epoch in range(Config.EPOCHS):
@@ -470,9 +399,6 @@ def main():
                         best_val_acc = val_acc
                         torch.save(model.state_dict(), best_model_path)
                 
-                # ==================================================================
-                # === FIM DA MEDIÇÃO DE TEMPO ===
-                # ==================================================================
                 end_time = time.time()
                 total_train_time_sec = end_time - start_time
                 print(f"\n[INFO] Tempo total de treinamento: {total_train_time_sec:.2f} segundos")
@@ -480,14 +406,10 @@ def main():
                 
                 save_accuracy_plot(train_acc_history, val_acc_history, os.path.join(feature_output_dir, 'accuracy_plot.png'))
                 
-                # 4. Avaliação no Teste (com o melhor modelo salvo)
                 print("\n[INFO] Avaliando no conjunto de teste com o melhor modelo...")
                 
-                # Adiciona uma verificação para o caso de nenhum modelo ser salvo (val_acc 0.0)
                 if not os.path.exists(best_model_path):
-                    print(f"[AVISO] Nenhum modelo foi salvo (best_model.path não encontrado). Provavelmente a acurácia de validação foi 0.0.")
-                    print("[AVISO] Pulando avaliação de teste para este modelo.")
-                    # Pula para o 'finally'
+                    print(f"[AVISO] Nenhum modelo foi salvo (best_model.path não encontrado).")
                     continue 
 
                 model.load_state_dict(torch.load(best_model_path))
@@ -499,14 +421,12 @@ def main():
                 if feature_test_results['labels'] is None:
                     feature_test_results['labels'] = np.array(y_true)
 
-                # 5. Cálculo de Métricas Detalhadas
                 macc = accuracy_score(y_true, y_pred)
                 f1 = f1_score(y_true, y_pred, average='weighted', zero_division=0)
                 precision = precision_score(y_true, y_pred, average='weighted', zero_division=0)
                 recall = recall_score(y_true, y_pred, average='weighted', zero_division=0)
                 
                 print(f"Acurácia (mACC) no Teste: {macc:.4f}")
-
                 print(classification_report(y_true, y_pred, target_names=class_names, labels=report_labels, zero_division=0))
                 
                 if is_color_feature:
@@ -527,7 +447,6 @@ def main():
                 
                 save_confusion_matrix(y_true, y_pred, class_names, os.path.join(feature_output_dir, 'confusion_matrix.png'), title=f'CM {feature}')
                 
-                # 6. Adicionar ao Relatório Geral
                 general_summary_list.append({
                     "model": model_name, 
                     "attribute": feature, 
@@ -542,7 +461,7 @@ def main():
                     "true_negatives": int(tn),
                     "total_acertos": acertou,
                     "total_erros": errou,
-                    "total_train_time_sec": total_train_time_sec, # <--- COLUNA ADICIONADA
+                    "total_train_time_sec": total_train_time_sec,
                     "dataset": Config.DATASET_NAME
                 })
 
@@ -554,7 +473,6 @@ def main():
         
         # === FIM DO LOOP DE MODELOS ===
 
-        # 7. Calcular Ensemble para o Atributo Atual
         print(f"\n[INFO] Calculando Ensemble (Hard & Soft Voting) para o atributo: {feature}")
         y_true = feature_test_results['labels']
         
@@ -603,7 +521,6 @@ def main():
             print(f"Erro no Soft Voting: {e}")
             acc_soft, f1_soft, p_soft, r_soft, tn_s, fp_s, fn_s, tp_s = 0,0,0,0,0,0,0,0
 
-        # 8. Adicionar ao Relatório de Ensemble
         ensemble_summary_list.append({
             "attribute": feature,
             "hard_accuracy": acc_hard,
@@ -627,7 +544,6 @@ def main():
 
     if general_summary_list:
         general_summary_df = pd.DataFrame(general_summary_list)
-        # Reordena colunas para colocar o tempo no final
         cols = [c for c in general_summary_df.columns if c not in ['dataset', 'total_train_time_sec']]
         cols.append('total_train_time_sec')
         cols.append('dataset')
@@ -647,5 +563,42 @@ def main():
 
     print("[INFO] Processamento concluído.")
 
+# ======================================================================================
+# 7. PONTO DE ENTRADA DO SCRIPT (AJUSTADO CONFORME SOLICITADO)
+# ======================================================================================
 if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description="Script de Treinamento de Modelos de Atributos (PAR2025)")
+
+    parser.add_argument(
+        '--data-root', 
+        type=str, 
+        default=Config.DATA_ROOT,
+        help=f"Caminho raiz para a pasta do dataset (padrão: {Config.DATA_ROOT})"
+    )
+    
+    parser.add_argument(
+        '--no-pretrained',
+        dest='use_pretrained',
+        action='store_false',
+        help="DESATIVA o transfer learning (treina do zero). O padrão é usar pesos pré-treinados."
+    )
+    
+    parser.add_argument(
+        '--epochs', 
+        type=int, 
+        default=Config.EPOCHS,
+        help=f"Número de épocas (padrão: {Config.EPOCHS})"
+    )
+
+    args = parser.parse_args()
+
+    Config.DATA_ROOT = args.data_root
+    Config.TRAIN_TXT = os.path.join(args.data_root, "training_set.txt")
+    Config.VAL_TEST_TXT = os.path.join(args.data_root, "validation_set.txt")
+    Config.DATASET_NAME = os.path.basename(args.data_root)
+    
+    Config.USE_PRETRAINED = args.use_pretrained
+    Config.EPOCHS = args.epochs
+
     main()
