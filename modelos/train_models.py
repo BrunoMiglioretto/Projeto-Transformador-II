@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
+from torchvision.transforms import v2
 
 # Ajustado para incluir train_test_split para a nova divisão
 from sklearn.model_selection import train_test_split
@@ -72,7 +73,7 @@ class Config:
     MODELS_TO_TRAIN: list = ['MobileNetV2', 'EfficientNet-B0', 'SwinV2-T']
     IMG_SIZE: int = 200
     BATCH_SIZE: int = 32
-    EPOCHS: int = 6
+    EPOCHS: int = 10
     LEARNING_RATE: float = 1e-4
 
     # === PARÂMETROS DE DIVISÃO (RE-ADICIONADOS) ===
@@ -85,7 +86,7 @@ class Config:
 # --- AJUSTE: DEFINIÇÃO DINÂMICA DO OUTPUT_DIR ---
 # Define o nome da pasta de saída com base na opção USE_PRETRAINED
 transfer_status = 'com_transfer_learning' if Config.USE_PRETRAINED else 'sem_transfer_learning'
-Config.OUTPUT_DIR = f"./output-{transfer_status}"
+Config.OUTPUT_DIR = f"./output-{transfer_status}-DataAgumentationDuranteTreinamento"
 # ------------------------------------------------
 
 # ======================================================================================
@@ -122,9 +123,29 @@ class AttributeDataset(Dataset):
 def get_transforms(img_size):
     return {
         'train': transforms.Compose([
-            transforms.Resize((img_size, img_size)),
+            # 1. Lida com zoom e posição de forma eficiente.
+            # É a transformação padrão-ouro para classificação.
+            # Usamos uma escala conservadora (0.8 a 1.0) para manter
+            # a maior parte do pedestre na imagem.
+            transforms.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
+            
+            # 2. A transformação geométrica mais importante para pedestres.
+            transforms.RandomHorizontalFlip(p=0.5),
+            
+            # --- NÃO ADICIONE NENHUMA TRANSFORMAÇÃO DE COR ---
+            # (Como ColorJitter, Grayscale, ou mesmo Autocontrast)
+            
+            # 3. Converter para Tensor
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            
+            # 4. Normalizar (padrão ImageNet)
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            
+            # 5. (Opcional, mas muito eficiente) Random Erasing
+            # Simula oclusão (ex: um poste, uma bolsa, outra pessoa na frente).
+            # Isso força o modelo a olhar para todas as partes do corpo
+            # para reconhecer os atributos.
+            transforms.RandomErasing(p=0.4, scale=(0.02, 0.2), ratio=(0.3, 3.3), value=0),
         ]),
         'val_test': transforms.Compose([
             transforms.Resize((img_size, img_size)),
