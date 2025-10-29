@@ -1,4 +1,4 @@
-# Pedestrian Attribute Recognition and Attributed-based Person Retrieval Challenge at WACV 2024 (UPAR@WACV2024)
+<!-- # Pedestrian Attribute Recognition and Attributed-based Person Retrieval Challenge at WACV 2024 (UPAR@WACV2024)
 
 The UPAR@WACV2024 challenge includes separate tracks for Pedestrian Attribute Recognition and Attribute-based Person
 Retrieval.
@@ -117,4 +117,4 @@ License: No license available.
 
 
 ## License
-This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/de/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License</a>.
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/de/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License</a>. -->

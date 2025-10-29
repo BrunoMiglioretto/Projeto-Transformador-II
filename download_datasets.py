@@ -11,136 +11,94 @@ import numpy as np
 from tqdm import tqdm
 
 
-def download_url(url, dst):
-    """Downloads file from a url to a destination.
-
-    Args:
-        url (str): url to download file.
-        dst (str): destination path.
-    """
-
-    print(f'* url="{url}"')
-    print(f'* destination="{dst}"')
-
-    def _reporthook(count, block_size, total_size):
-        global start_time
-        if count == 0:
-            start_time = time.time()
-            return
-        duration = time.time() - start_time + 1e-6
-        progress_size = int(count * block_size)
-        speed = int(progress_size / (1024 * duration))
-        percent = int(count * block_size * 100 / total_size + 1e-6)
-        sys.stdout.write(
-            "\r...%d%%, %d MB, %d KB/s, %d seconds passed" % (percent, progress_size / (1024 * 1024), speed, duration)
-        )
-        sys.stdout.flush()
-
-    if dst.exists():
-        return
-    else:
-        urllib.request.urlretrieve(url, dst, _reporthook)
-        sys.stdout.write("\n")
-
-
+#
+# FUNÇÃO AUXILIAR MANTIDA DO SCRIPT ORIGINAL
+#
 def extract_zip(src, dst):
+    """Extrai um arquivo zip para um diretório de destino."""
+    print(f"Extraindo '{src.name}' para '{dst}'...")
     with zipfile.ZipFile(src, "r") as zf:
-        for member in tqdm(zf.infolist(), desc="Extracting "):
+        for member in tqdm(zf.infolist(), desc="Progresso da extração"):
             try:
                 zf.extract(member, dst)
             except zipfile.error as err:
-                print(err)
+                print(f"Erro ao extrair {member.filename}: {err}")
 
 
-def prepare_market(dataset_path):
-    # Market 1501 dataset
-    market_1501_path = dataset_path / "Market1501"
-    market_1501_zipfile = dataset_path / "market_1501.zip"
-    url = "https://drive.google.com/file/d/0B8-rUzbwVRk0c054eEozWG9COHM/view?resourcekey=0-8nyl7K9_x37HlQm34MmrYQ"
-    print("Download Market 1501 dataset")
-    gdown.download(url, output=str(market_1501_zipfile), quiet=False, use_cookies=False, fuzzy=True)
-    print("Extract Market 1501 dataset")
-    extract_zip(market_1501_zipfile, dataset_path)
-    Path(dataset_path / "Market-1501-v15.09.15").rename(market_1501_path)
-
-
-def prepare_pa100k(dataset_path):
-    # PA-100K dataset
-    pa100k_path = dataset_path / "PA100k"
-    pa100k_path.mkdir(parents=True, exist_ok=True)
-    print("Download PA100k dataset")
-    url = "https://drive.google.com/drive/folders/1d_D0Yh7C262gr0ef9EqkvG_M3fqgAWa2?usp=sharing"
-    gdown.download_folder(url, output=str(pa100k_path), quiet=False, use_cookies=False)
-    print("Extract PA100k dataset")
-    extract_zip(pa100k_path / "data.zip", pa100k_path)
-
-
-def prepare_peta(dataset_path):
-    # PETA dataset
-    peta_path = dataset_path / "PETA"
-    peta_path.mkdir(parents=True, exist_ok=True)
-    peta_zipfile = peta_path / "peta.zip"
-    print("Download PETA dataset")
-    url = "https://www.dropbox.com/s/52ylx522hwbdxz6/PETA.zip?dl=1"
-    download_url(url, peta_zipfile)
-    print("Extract PETA dataset")
-    extract_zip(peta_zipfile, peta_path)
-    peta_img_path = peta_path / "images"
-    peta_img_path.mkdir(parents=True, exist_ok=True)
-    mapping = {row[0]: row[1] for row in np.genfromtxt("peta_file_mapping.txt", dtype=str, delimiter=",")}
-    for file in tqdm(peta_path.glob("*/*/*/*")):
-        if file.suffix == ".txt":
-            continue
-        shutil.move(file, dataset_path / mapping[str(PurePosixPath(file)).replace(str(dataset_path) + "/", "")])
-
-
-def prepare_annotations(dataset_path):
-    anno_path = dataset_path / "annotations"
-    anno_path.mkdir(parents=True, exist_ok=True)
-    anno_zipfile = anno_path / "development.zip"
-    print("Download annotations")
-    url = "https://drive.google.com/file/d/1FMX9nUrXArxW4wkORO6Z7zp7xy7JBjUM/view?usp=sharing"
-    gdown.download(url, output=str(anno_zipfile), quiet=False, use_cookies=False, fuzzy=True)
-    print("Extract annotations")
-    extract_zip(anno_zipfile, anno_path)
-
-
-def prepare_templates(dataset_path):
-    template_zipfile = dataset_path / "submission_templates.zip"
-    print("Download templates")
-    url = "https://drive.google.com/file/d/11ZxT8kixkV-vAj8aixS8n2aGJ5Rw0OQy/view?usp=sharing"
-    gdown.download(url, output=str(template_zipfile), quiet=False, use_cookies=False, fuzzy=True)
-    print("Extract templates")
-    extract_zip(template_zipfile, dataset_path)
-
-
+#
+# FUNÇÃO PRINCIPAL AJUSTADA PARA SEU DATASET
+#
 def prepare_datasets(path):
-    # Datasets folder
+    """
+    Baixa e prepara o dataset PAR2025 conforme as imagens fornecidas.
+    """
+    # 1. Define e cria o diretório de dados principal (ex: ./data)
     dataset_path = Path(path)
     dataset_path.mkdir(parents=True, exist_ok=True)
+    print(f"Diretório de dados assegurado: {dataset_path.resolve()}")
 
-    # Download & extract datasets
-    prepare_market(dataset_path)
-    prepare_pa100k(dataset_path)
-    prepare_peta(dataset_path)
+    # 2. Define a URL e o local de download do .zip principal
+    url = "https://drive.google.com/file/d/1ZPlmw2PxYctWjFBFKRw-CVM6G4Agd_ar/view?usp=sharing"
+    main_zipfile = dataset_path / "PAR2025_main.zip"
 
-    # Download & extract annotations
-    prepare_annotations(dataset_path)
+    # 3. Baixa o arquivo .zip principal
+    print(f"Baixando dataset principal de {url}...")
+    gdown.download(url, output=str(main_zipfile), quiet=False, use_cookies=False, fuzzy=True)
 
-    # Download & extract submission templates
-    prepare_templates(Path("./"))
+    # 4. Extrai o .zip principal para o diretório 'data'
+    #    Isso deve criar a pasta 'data/PAR2025'
+    extract_zip(main_zipfile, dataset_path)
+
+    # 5. Define o caminho para a pasta PAR2025 (criada no passo anterior)
+    par_dir = dataset_path / "PAR2025"
+    if not par_dir.exists() or not par_dir.is_dir():
+        print(f"ERRO: A pasta {par_dir} não foi criada corretamente.")
+        print("Por favor, verifique se o .zip baixado contém a pasta 'PAR2025'.")
+        return
+
+    print(f"Pasta do dataset encontrada: {par_dir.resolve()}")
+
+    # 6. Define os caminhos para os .zip internos (training_set.zip, etc.)
+    train_zip = par_dir / "training_set.zip"
+    val_zip = par_dir / "validation_set.zip"
+
+    # 7. Extrai o 'training_set.zip' dentro de 'data/PAR2025/'
+    #    Isso criará a pasta 'data/PAR2025/training_set'
+    if train_zip.exists():
+        extract_zip(train_zip, par_dir)
+        train_zip.unlink()  # Remove o .zip após a extração
+        print("Extração de 'training_set' concluída.")
+    else:
+        print(f"AVISO: {train_zip.name} não encontrado em {par_dir}")
+
+    # 8. Extrai o 'validation_set.zip' dentro de 'data/PAR2025/'
+    #    Isso criará a pasta 'data/PAR2025/validation_set'
+    if val_zip.exists():
+        extract_zip(val_zip, par_dir)
+        val_zip.unlink()  # Remove o .zip após a extração
+        print("Extração de 'validation_set' concluída.")
+    else:
+        print(f"AVISO: {val_zip.name} não encontrado em {par_dir}")
+
+    # 9. Remove o .zip principal que foi baixado
+    main_zipfile.unlink()
+    print(f"Download e preparação concluídos. Arquivos temporários removidos.")
+    print(f"Estrutura final em: {par_dir}")
 
 
+#
+# BLOCO DE EXECUÇÃO MANTIDO DO SCRIPT ORIGINAL
+#
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="WACV2024 RWS UPAR Challenge",
+        description="Script de Download e Preparação do Dataset PAR2025",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="./data",
-        help="Dataset directory. Downloaded datasets are stored in this directory.",
+        default="./data",  # Cria a pasta 'data' no mesmo diretório do script
+        help="Diretório do dataset. O dataset baixado será armazenado aqui.",
     )
     args = parser.parse_args()
 
