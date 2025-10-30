@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: gender (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): True
+[INFO] A saída está sendo salva em: ./output-com_transfer_learning-DataAgumentationDuranteTreinamento/gender/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.3317, Acurácia: 0.8518
+Validação -> Perda: 0.3754, Acurácia: 0.8250
+
+Época 2/10
+Treino -> Perda: 0.2362, Acurácia: 0.9003
+Validação -> Perda: 0.3662, Acurácia: 0.8430
+
+Época 3/10
+Treino -> Perda: 0.1948, Acurácia: 0.9207
+Validação -> Perda: 0.3030, Acurácia: 0.8726
+
+Época 4/10
+Treino -> Perda: 0.1632, Acurácia: 0.9343
+Validação -> Perda: 0.3434, Acurácia: 0.8528
+
+Época 5/10
+Treino -> Perda: 0.1377, Acurácia: 0.9451
+Validação -> Perda: 0.3850, Acurácia: 0.8548
+
+Época 6/10
+Treino -> Perda: 0.1184, Acurácia: 0.9529
+Validação -> Perda: 0.4170, Acurácia: 0.8530
+
+Época 7/10
+Treino -> Perda: 0.1011, Acurácia: 0.9598
+Validação -> Perda: 0.4102, Acurácia: 0.8548
+
+Época 8/10
+Treino -> Perda: 0.0901, Acurácia: 0.9646
+Validação -> Perda: 0.4128, Acurácia: 0.8437
+
+Época 9/10
+Treino -> Perda: 0.0804, Acurácia: 0.9692
+Validação -> Perda: 0.4389, Acurácia: 0.8560
+
+Época 10/10
+Treino -> Perda: 0.0722, Acurácia: 0.9730
+Validação -> Perda: 0.5331, Acurácia: 0.8442
+
+[INFO] Tempo total de treinamento: 2721.99 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8742
+              precision    recall  f1-score   support
+
+  Not_gender       0.89      0.93      0.91      4447
+      gender       0.82      0.72      0.77      1778
+
+    accuracy                           0.87      6225
+   macro avg       0.85      0.83      0.84      6225
+weighted avg       0.87      0.87      0.87      6225
+

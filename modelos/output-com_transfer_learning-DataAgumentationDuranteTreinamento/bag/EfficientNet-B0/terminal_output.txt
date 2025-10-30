@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: bag (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): True
+[INFO] A saída está sendo salva em: ./output-com_transfer_learning-DataAgumentationDuranteTreinamento/bag/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.2928, Acurácia: 0.8845
+Validação -> Perda: 0.3815, Acurácia: 0.8740
+
+Época 2/10
+Treino -> Perda: 0.2143, Acurácia: 0.9182
+Validação -> Perda: 0.4413, Acurácia: 0.8856
+
+Época 3/10
+Treino -> Perda: 0.1771, Acurácia: 0.9322
+Validação -> Perda: 0.4445, Acurácia: 0.8874
+
+Época 4/10
+Treino -> Perda: 0.1493, Acurácia: 0.9439
+Validação -> Perda: 0.5699, Acurácia: 0.8814
+
+Época 5/10
+Treino -> Perda: 0.1249, Acurácia: 0.9525
+Validação -> Perda: 0.5077, Acurácia: 0.8877
+
+Época 6/10
+Treino -> Perda: 0.1063, Acurácia: 0.9590
+Validação -> Perda: 0.6342, Acurácia: 0.8721
+
+Época 7/10
+Treino -> Perda: 0.0909, Acurácia: 0.9654
+Validação -> Perda: 0.7195, Acurácia: 0.8861
+
+Época 8/10
+Treino -> Perda: 0.0785, Acurácia: 0.9708
+Validação -> Perda: 0.9189, Acurácia: 0.8766
+
+Época 9/10
+Treino -> Perda: 0.0715, Acurácia: 0.9735
+Validação -> Perda: 0.8337, Acurácia: 0.8848
+
+Época 10/10
+Treino -> Perda: 0.0636, Acurácia: 0.9763
+Validação -> Perda: 0.7957, Acurácia: 0.8665
+
+[INFO] Tempo total de treinamento: 2948.59 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8906
+              precision    recall  f1-score   support
+
+     Not_bag       0.92      0.95      0.93      5073
+         bag       0.74      0.64      0.68      1152
+
+    accuracy                           0.89      6225
+   macro avg       0.83      0.79      0.81      6225
+weighted avg       0.89      0.89      0.89      6225
+

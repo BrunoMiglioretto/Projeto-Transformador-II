@@ -1,0 +1,43 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: bag (Classes: 2)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/bag/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.2914, Acurácia: 0.8846
+Validação -> Perda: 0.3263, Acurácia: 0.8962
+
+Época 2/6
+Treino -> Perda: 0.1967, Acurácia: 0.9252
+Validação -> Perda: 0.3108, Acurácia: 0.9100
+
+Época 3/6
+Treino -> Perda: 0.1393, Acurácia: 0.9468
+Validação -> Perda: 0.3463, Acurácia: 0.9087
+
+Época 4/6
+Treino -> Perda: 0.0906, Acurácia: 0.9653
+Validação -> Perda: 0.4216, Acurácia: 0.9076
+
+Época 5/6
+Treino -> Perda: 0.0634, Acurácia: 0.9760
+Validação -> Perda: 0.5027, Acurácia: 0.9068
+
+Época 6/6
+Treino -> Perda: 0.0488, Acurácia: 0.9818
+Validação -> Perda: 0.5887, Acurácia: 0.9075
+
+[INFO] Tempo total de treinamento: 1367.17 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8998
+              precision    recall  f1-score   support
+
+     Not_bag       0.95      0.93      0.94      5073
+         bag       0.71      0.76      0.74      1152
+
+    accuracy                           0.90      6225
+   macro avg       0.83      0.85      0.84      6225
+weighted avg       0.90      0.90      0.90      6225
+

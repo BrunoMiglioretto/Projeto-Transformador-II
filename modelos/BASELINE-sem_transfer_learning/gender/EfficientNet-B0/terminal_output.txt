@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: gender (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning/gender/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.4731, Acurácia: 0.7758
+Validação -> Perda: 0.3736, Acurácia: 0.8393
+
+Época 2/10
+Treino -> Perda: 0.3308, Acurácia: 0.8577
+Validação -> Perda: 0.3100, Acurácia: 0.8761
+
+Época 3/10
+Treino -> Perda: 0.2684, Acurácia: 0.8880
+Validação -> Perda: 0.2827, Acurácia: 0.8903
+
+Época 4/10
+Treino -> Perda: 0.2279, Acurácia: 0.9062
+Validação -> Perda: 0.2601, Acurácia: 0.8941
+
+Época 5/10
+Treino -> Perda: 0.1993, Acurácia: 0.9198
+Validação -> Perda: 0.2549, Acurácia: 0.8999
+
+Época 6/10
+Treino -> Perda: 0.1733, Acurácia: 0.9303
+Validação -> Perda: 0.2561, Acurácia: 0.9012
+
+Época 7/10
+Treino -> Perda: 0.1535, Acurácia: 0.9390
+Validação -> Perda: 0.2545, Acurácia: 0.9062
+
+Época 8/10
+Treino -> Perda: 0.1331, Acurácia: 0.9471
+Validação -> Perda: 0.2790, Acurácia: 0.8970
+
+Época 9/10
+Treino -> Perda: 0.1178, Acurácia: 0.9533
+Validação -> Perda: 0.3140, Acurácia: 0.9073
+
+Época 10/10
+Treino -> Perda: 0.1032, Acurácia: 0.9599
+Validação -> Perda: 0.2703, Acurácia: 0.9078
+
+[INFO] Tempo total de treinamento: 2967.91 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9038
+              precision    recall  f1-score   support
+
+  Not_gender       0.92      0.95      0.93      4447
+      gender       0.87      0.78      0.82      1778
+
+    accuracy                           0.90      6225
+   macro avg       0.89      0.87      0.88      6225
+weighted avg       0.90      0.90      0.90      6225
+

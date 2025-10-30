@@ -1,0 +1,43 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: gender (Classes: 2)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/gender/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.2081, Acurácia: 0.9127
+Validação -> Perda: 0.1744, Acurácia: 0.9290
+
+Época 2/6
+Treino -> Perda: 0.1168, Acurácia: 0.9557
+Validação -> Perda: 0.1621, Acurácia: 0.9373
+
+Época 3/6
+Treino -> Perda: 0.0792, Acurácia: 0.9700
+Validação -> Perda: 0.1589, Acurácia: 0.9391
+
+Época 4/6
+Treino -> Perda: 0.0529, Acurácia: 0.9797
+Validação -> Perda: 0.1781, Acurácia: 0.9404
+
+Época 5/6
+Treino -> Perda: 0.0401, Acurácia: 0.9850
+Validação -> Perda: 0.1988, Acurácia: 0.9364
+
+Época 6/6
+Treino -> Perda: 0.0323, Acurácia: 0.9878
+Validação -> Perda: 0.2261, Acurácia: 0.9401
+
+[INFO] Tempo total de treinamento: 1364.53 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9446
+              precision    recall  f1-score   support
+
+  Not_gender       0.95      0.98      0.96      4447
+      gender       0.93      0.87      0.90      1778
+
+    accuracy                           0.94      6225
+   macro avg       0.94      0.92      0.93      6225
+weighted avg       0.94      0.94      0.94      6225
+

@@ -1,0 +1,52 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: lower_color (Classes: 11)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/lower_color/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.5288, Acurácia: 0.8234
+Validação -> Perda: 0.3169, Acurácia: 0.8866
+
+Época 2/6
+Treino -> Perda: 0.3926, Acurácia: 0.8635
+Validação -> Perda: 0.3136, Acurácia: 0.8871
+
+Época 3/6
+Treino -> Perda: 0.3357, Acurácia: 0.8800
+Validação -> Perda: 0.3200, Acurácia: 0.8906
+
+Época 4/6
+Treino -> Perda: 0.2828, Acurácia: 0.8978
+Validação -> Perda: 0.3476, Acurácia: 0.8858
+
+Época 5/6
+Treino -> Perda: 0.2320, Acurácia: 0.9161
+Validação -> Perda: 0.3890, Acurácia: 0.8781
+
+Época 6/6
+Treino -> Perda: 0.1911, Acurácia: 0.9306
+Validação -> Perda: 0.4588, Acurácia: 0.8800
+
+[INFO] Tempo total de treinamento: 1709.20 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8914
+              precision    recall  f1-score   support
+
+           1       0.93      0.95      0.94      3853
+           2       0.89      0.88      0.88      1723
+           3       0.41      0.29      0.34        49
+           4       0.62      0.67      0.64       353
+           5       0.77      0.43      0.55        84
+           6       0.00      0.00      0.00         2
+           7       0.50      0.33      0.40         6
+           8       0.67      0.40      0.50         5
+           9       0.59      0.50      0.54        26
+          10       0.69      0.51      0.59        49
+          11       0.72      0.83      0.77        75
+
+    accuracy                           0.89      6225
+   macro avg       0.62      0.53      0.56      6225
+weighted avg       0.89      0.89      0.89      6225
+

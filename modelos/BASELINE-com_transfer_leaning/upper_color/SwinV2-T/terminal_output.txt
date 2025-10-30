@@ -1,0 +1,52 @@
+
+================================================================================
+[INFO] Treinando modelo: SwinV2-T para o atributo: upper_color (Classes: 11)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/upper_color/SwinV2-T/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.7066, Acurácia: 0.7800
+Validação -> Perda: 0.4793, Acurácia: 0.8422
+
+Época 2/6
+Treino -> Perda: 0.5819, Acurácia: 0.8148
+Validação -> Perda: 0.5112, Acurácia: 0.8392
+
+Época 3/6
+Treino -> Perda: 0.5275, Acurácia: 0.8303
+Validação -> Perda: 0.4761, Acurácia: 0.8511
+
+Época 4/6
+Treino -> Perda: 0.4747, Acurácia: 0.8471
+Validação -> Perda: 0.4788, Acurácia: 0.8580
+
+Época 5/6
+Treino -> Perda: 0.4210, Acurácia: 0.8633
+Validação -> Perda: 0.5210, Acurácia: 0.8443
+
+Época 6/6
+Treino -> Perda: 0.3776, Acurácia: 0.8770
+Validação -> Perda: 0.5228, Acurácia: 0.8504
+
+[INFO] Tempo total de treinamento: 6642.86 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8646
+              precision    recall  f1-score   support
+
+           1       0.92      0.95      0.94      3244
+           2       0.83      0.84      0.84       564
+           3       0.71      0.52      0.60       191
+           4       0.81      0.66      0.73       696
+           5       0.61      0.86      0.71       208
+           6       0.62      0.37      0.46        35
+           7       0.89      0.71      0.79       128
+           8       0.73      0.76      0.75       144
+           9       0.83      0.90      0.86       376
+          10       0.84      0.86      0.85       487
+          11       0.83      0.76      0.79       152
+
+    accuracy                           0.86      6225
+   macro avg       0.78      0.74      0.76      6225
+weighted avg       0.86      0.86      0.86      6225
+

@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: hat (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning/hat/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.2635, Acurácia: 0.8924
+Validação -> Perda: 0.1290, Acurácia: 0.9648
+
+Época 2/10
+Treino -> Perda: 0.2054, Acurácia: 0.9214
+Validação -> Perda: 0.1197, Acurácia: 0.9663
+
+Época 3/10
+Treino -> Perda: 0.1819, Acurácia: 0.9300
+Validação -> Perda: 0.1204, Acurácia: 0.9679
+
+Época 4/10
+Treino -> Perda: 0.1622, Acurácia: 0.9397
+Validação -> Perda: 0.1134, Acurácia: 0.9664
+
+Época 5/10
+Treino -> Perda: 0.1489, Acurácia: 0.9442
+Validação -> Perda: 0.1127, Acurácia: 0.9674
+
+Época 6/10
+Treino -> Perda: 0.1351, Acurácia: 0.9495
+Validação -> Perda: 0.1061, Acurácia: 0.9695
+
+Época 7/10
+Treino -> Perda: 0.1249, Acurácia: 0.9529
+Validação -> Perda: 0.1105, Acurácia: 0.9675
+
+Época 8/10
+Treino -> Perda: 0.1152, Acurácia: 0.9567
+Validação -> Perda: 0.1021, Acurácia: 0.9706
+
+Época 9/10
+Treino -> Perda: 0.1046, Acurácia: 0.9598
+Validação -> Perda: 0.1135, Acurácia: 0.9653
+
+Época 10/10
+Treino -> Perda: 0.0956, Acurácia: 0.9645
+Validação -> Perda: 0.1206, Acurácia: 0.9656
+
+[INFO] Tempo total de treinamento: 2379.00 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9656
+              precision    recall  f1-score   support
+
+     Not_hat       0.98      0.99      0.98      5580
+         hat       0.87      0.79      0.83       645
+
+    accuracy                           0.97      6225
+   macro avg       0.92      0.89      0.90      6225
+weighted avg       0.96      0.97      0.96      6225
+

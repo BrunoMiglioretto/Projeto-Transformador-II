@@ -1,0 +1,52 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: lower_color (Classes: 11)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/lower_color/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.5607, Acurácia: 0.8108
+Validação -> Perda: 0.3449, Acurácia: 0.8803
+
+Época 2/6
+Treino -> Perda: 0.4040, Acurácia: 0.8598
+Validação -> Perda: 0.3373, Acurácia: 0.8834
+
+Época 3/6
+Treino -> Perda: 0.3350, Acurácia: 0.8813
+Validação -> Perda: 0.3502, Acurácia: 0.8809
+
+Época 4/6
+Treino -> Perda: 0.2685, Acurácia: 0.9037
+Validação -> Perda: 0.3735, Acurácia: 0.8787
+
+Época 5/6
+Treino -> Perda: 0.2084, Acurácia: 0.9251
+Validação -> Perda: 0.4153, Acurácia: 0.8763
+
+Época 6/6
+Treino -> Perda: 0.1606, Acurácia: 0.9435
+Validação -> Perda: 0.4840, Acurácia: 0.8761
+
+[INFO] Tempo total de treinamento: 1289.94 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8837
+              precision    recall  f1-score   support
+
+           1       0.92      0.95      0.93      3853
+           2       0.90      0.86      0.88      1723
+           3       0.37      0.37      0.37        49
+           4       0.60      0.62      0.61       353
+           5       0.77      0.43      0.55        84
+           6       1.00      0.50      0.67         2
+           7       0.75      0.50      0.60         6
+           8       0.00      0.00      0.00         5
+           9       0.69      0.42      0.52        26
+          10       0.61      0.51      0.56        49
+          11       0.82      0.65      0.73        75
+
+    accuracy                           0.88      6225
+   macro avg       0.67      0.53      0.58      6225
+weighted avg       0.88      0.88      0.88      6225
+

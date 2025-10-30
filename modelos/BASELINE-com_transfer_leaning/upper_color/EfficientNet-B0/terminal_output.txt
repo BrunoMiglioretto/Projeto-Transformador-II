@@ -1,0 +1,52 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: upper_color (Classes: 11)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/upper_color/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.7496, Acurácia: 0.7663
+Validação -> Perda: 0.4559, Acurácia: 0.8546
+
+Época 2/6
+Treino -> Perda: 0.5721, Acurácia: 0.8170
+Validação -> Perda: 0.4809, Acurácia: 0.8503
+
+Época 3/6
+Treino -> Perda: 0.5064, Acurácia: 0.8362
+Validação -> Perda: 0.4837, Acurácia: 0.8477
+
+Época 4/6
+Treino -> Perda: 0.4377, Acurácia: 0.8559
+Validação -> Perda: 0.5054, Acurácia: 0.8544
+
+Época 5/6
+Treino -> Perda: 0.3730, Acurácia: 0.8755
+Validação -> Perda: 0.5718, Acurácia: 0.8419
+
+Época 6/6
+Treino -> Perda: 0.3153, Acurácia: 0.8943
+Validação -> Perda: 0.6309, Acurácia: 0.8411
+
+[INFO] Tempo total de treinamento: 1711.66 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8601
+              precision    recall  f1-score   support
+
+           1       0.92      0.95      0.94      3244
+           2       0.83      0.81      0.82       564
+           3       0.68      0.58      0.62       191
+           4       0.77      0.72      0.74       696
+           5       0.70      0.82      0.75       208
+           6       0.61      0.31      0.42        35
+           7       0.78      0.68      0.72       128
+           8       0.69      0.66      0.67       144
+           9       0.79      0.90      0.84       376
+          10       0.88      0.79      0.83       487
+          11       0.85      0.72      0.78       152
+
+    accuracy                           0.86      6225
+   macro avg       0.77      0.72      0.74      6225
+weighted avg       0.86      0.86      0.86      6225
+

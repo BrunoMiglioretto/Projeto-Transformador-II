@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: SwinV2-T para o atributo: hat (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning-DataAgumentationDuranteTreinamento/hat/SwinV2-T/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.2916, Acurácia: 0.8798
+Validação -> Perda: 0.2110, Acurácia: 0.9354
+
+Época 2/10
+Treino -> Perda: 0.2349, Acurácia: 0.9083
+Validação -> Perda: 0.1333, Acurácia: 0.9637
+
+Época 3/10
+Treino -> Perda: 0.2200, Acurácia: 0.9166
+Validação -> Perda: 0.1368, Acurácia: 0.9648
+
+Época 4/10
+Treino -> Perda: 0.2098, Acurácia: 0.9205
+Validação -> Perda: 0.1230, Acurácia: 0.9659
+
+Época 5/10
+Treino -> Perda: 0.2060, Acurácia: 0.9226
+Validação -> Perda: 0.1233, Acurácia: 0.9693
+
+Época 6/10
+Treino -> Perda: 0.2010, Acurácia: 0.9254
+Validação -> Perda: 0.1226, Acurácia: 0.9677
+
+Época 7/10
+Treino -> Perda: 0.1975, Acurácia: 0.9271
+Validação -> Perda: 0.1248, Acurácia: 0.9669
+
+Época 8/10
+Treino -> Perda: 0.1957, Acurácia: 0.9276
+Validação -> Perda: 0.1217, Acurácia: 0.9683
+
+Época 9/10
+Treino -> Perda: 0.1908, Acurácia: 0.9294
+Validação -> Perda: 0.1171, Acurácia: 0.9683
+
+Época 10/10
+Treino -> Perda: 0.1881, Acurácia: 0.9303
+Validação -> Perda: 0.1218, Acurácia: 0.9658
+
+[INFO] Tempo total de treinamento: 13126.08 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9648
+              precision    recall  f1-score   support
+
+     Not_hat       0.97      0.99      0.98      5580
+         hat       0.88      0.77      0.82       645
+
+    accuracy                           0.96      6225
+   macro avg       0.93      0.88      0.90      6225
+weighted avg       0.96      0.96      0.96      6225
+

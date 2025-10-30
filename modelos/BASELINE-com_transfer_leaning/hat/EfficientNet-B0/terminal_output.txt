@@ -1,0 +1,43 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: hat (Classes: 2)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/hat/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.1225, Acurácia: 0.9537
+Validação -> Perda: 0.0555, Acurácia: 0.9830
+
+Época 2/6
+Treino -> Perda: 0.0704, Acurácia: 0.9741
+Validação -> Perda: 0.0563, Acurácia: 0.9836
+
+Época 3/6
+Treino -> Perda: 0.0494, Acurácia: 0.9809
+Validação -> Perda: 0.0581, Acurácia: 0.9839
+
+Época 4/6
+Treino -> Perda: 0.0339, Acurácia: 0.9872
+Validação -> Perda: 0.0734, Acurácia: 0.9823
+
+Época 5/6
+Treino -> Perda: 0.0257, Acurácia: 0.9904
+Validação -> Perda: 0.0745, Acurácia: 0.9836
+
+Época 6/6
+Treino -> Perda: 0.0200, Acurácia: 0.9928
+Validação -> Perda: 0.1046, Acurácia: 0.9820
+
+[INFO] Tempo total de treinamento: 1799.66 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9801
+              precision    recall  f1-score   support
+
+     Not_hat       0.99      0.99      0.99      5580
+         hat       0.91      0.90      0.90       645
+
+    accuracy                           0.98      6225
+   macro avg       0.95      0.94      0.95      6225
+weighted avg       0.98      0.98      0.98      6225
+

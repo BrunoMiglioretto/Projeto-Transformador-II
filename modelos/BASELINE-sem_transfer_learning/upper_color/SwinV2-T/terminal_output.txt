@@ -1,0 +1,69 @@
+
+================================================================================
+[INFO] Treinando modelo: SwinV2-T para o atributo: upper_color (Classes: 11)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning/upper_color/SwinV2-T/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 1.2264, Acurácia: 0.6271
+Validação -> Perda: 0.8175, Acurácia: 0.7463
+
+Época 2/10
+Treino -> Perda: 0.9168, Acurácia: 0.7194
+Validação -> Perda: 0.6165, Acurácia: 0.8013
+
+Época 3/10
+Treino -> Perda: 0.8336, Acurácia: 0.7436
+Validação -> Perda: 0.5672, Acurácia: 0.8180
+
+Época 4/10
+Treino -> Perda: 0.7861, Acurácia: 0.7584
+Validação -> Perda: 0.5598, Acurácia: 0.8176
+
+Época 5/10
+Treino -> Perda: 0.7595, Acurácia: 0.7640
+Validação -> Perda: 0.5507, Acurácia: 0.8254
+
+Época 6/10
+Treino -> Perda: 0.7363, Acurácia: 0.7702
+Validação -> Perda: 0.6101, Acurácia: 0.8070
+
+Época 7/10
+Treino -> Perda: 0.7176, Acurácia: 0.7776
+Validação -> Perda: 0.5246, Acurácia: 0.8348
+
+Época 8/10
+Treino -> Perda: 0.6949, Acurácia: 0.7814
+Validação -> Perda: 0.5120, Acurácia: 0.8363
+
+Época 9/10
+Treino -> Perda: 0.6820, Acurácia: 0.7868
+Validação -> Perda: 0.5475, Acurácia: 0.8260
+
+Época 10/10
+Treino -> Perda: 0.6710, Acurácia: 0.7892
+Validação -> Perda: 0.5075, Acurácia: 0.8366
+
+[INFO] Tempo total de treinamento: 11510.51 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8345
+              precision    recall  f1-score   support
+
+           1       0.91      0.94      0.93      3244
+           2       0.81      0.77      0.79       564
+           3       0.58      0.42      0.49       191
+           4       0.76      0.63      0.69       696
+           5       0.53      0.82      0.64       208
+           6       0.48      0.29      0.36        35
+           7       0.82      0.65      0.72       128
+           8       0.73      0.71      0.72       144
+           9       0.79      0.88      0.83       376
+          10       0.80      0.80      0.80       487
+          11       0.87      0.64      0.74       152
+
+    accuracy                           0.83      6225
+   macro avg       0.73      0.69      0.70      6225
+weighted avg       0.83      0.83      0.83      6225
+

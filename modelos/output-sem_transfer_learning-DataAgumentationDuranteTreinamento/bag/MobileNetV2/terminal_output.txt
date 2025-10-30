@@ -1,0 +1,60 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: bag (Classes: 2)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning-DataAgumentationDuranteTreinamento/bag/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 0.4934, Acurácia: 0.7854
+Validação -> Perda: 0.4506, Acurácia: 0.8324
+
+Época 2/10
+Treino -> Perda: 0.4383, Acurácia: 0.8209
+Validação -> Perda: 0.4902, Acurácia: 0.8307
+
+Época 3/10
+Treino -> Perda: 0.4174, Acurácia: 0.8298
+Validação -> Perda: 0.4792, Acurácia: 0.8184
+
+Época 4/10
+Treino -> Perda: 0.4004, Acurácia: 0.8357
+Validação -> Perda: 0.4549, Acurácia: 0.8294
+
+Época 5/10
+Treino -> Perda: 0.3851, Acurácia: 0.8423
+Validação -> Perda: 0.4346, Acurácia: 0.8353
+
+Época 6/10
+Treino -> Perda: 0.3705, Acurácia: 0.8491
+Validação -> Perda: 0.4642, Acurácia: 0.8218
+
+Época 7/10
+Treino -> Perda: 0.3583, Acurácia: 0.8542
+Validação -> Perda: 0.4401, Acurácia: 0.8234
+
+Época 8/10
+Treino -> Perda: 0.3477, Acurácia: 0.8599
+Validação -> Perda: 0.4179, Acurácia: 0.8374
+
+Época 9/10
+Treino -> Perda: 0.3375, Acurácia: 0.8640
+Validação -> Perda: 0.4224, Acurácia: 0.8430
+
+Época 10/10
+Treino -> Perda: 0.3289, Acurácia: 0.8669
+Validação -> Perda: 0.4493, Acurácia: 0.8233
+
+[INFO] Tempo total de treinamento: 3053.22 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8376
+              precision    recall  f1-score   support
+
+     Not_bag       0.87      0.94      0.90      5073
+         bag       0.60      0.38      0.46      1152
+
+    accuracy                           0.84      6225
+   macro avg       0.73      0.66      0.68      6225
+weighted avg       0.82      0.84      0.82      6225
+

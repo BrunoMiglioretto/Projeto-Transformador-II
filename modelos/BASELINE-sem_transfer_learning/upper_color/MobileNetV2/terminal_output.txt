@@ -1,0 +1,69 @@
+
+================================================================================
+[INFO] Treinando modelo: MobileNetV2 para o atributo: upper_color (Classes: 11)
+[INFO] Transfer Learning (Pesos Pré-treinados): False
+[INFO] A saída está sendo salva em: ./output-sem_transfer_learning/upper_color/MobileNetV2/terminal_output.txt
+================================================================================
+
+Época 1/10
+Treino -> Perda: 1.2272, Acurácia: 0.6223
+Validação -> Perda: 0.8038, Acurácia: 0.7587
+
+Época 2/10
+Treino -> Perda: 0.9486, Acurácia: 0.7088
+Validação -> Perda: 0.6931, Acurácia: 0.7828
+
+Época 3/10
+Treino -> Perda: 0.8502, Acurácia: 0.7358
+Validação -> Perda: 0.6341, Acurácia: 0.7942
+
+Época 4/10
+Treino -> Perda: 0.7812, Acurácia: 0.7563
+Validação -> Perda: 0.5759, Acurácia: 0.8175
+
+Época 5/10
+Treino -> Perda: 0.7310, Acurácia: 0.7707
+Validação -> Perda: 0.5771, Acurácia: 0.8197
+
+Época 6/10
+Treino -> Perda: 0.6856, Acurácia: 0.7852
+Validação -> Perda: 0.5858, Acurácia: 0.8149
+
+Época 7/10
+Treino -> Perda: 0.6466, Acurácia: 0.7949
+Validação -> Perda: 0.5522, Acurácia: 0.8244
+
+Época 8/10
+Treino -> Perda: 0.6101, Acurácia: 0.8037
+Validação -> Perda: 0.5718, Acurácia: 0.8209
+
+Época 9/10
+Treino -> Perda: 0.5699, Acurácia: 0.8171
+Validação -> Perda: 0.5832, Acurácia: 0.8220
+
+Época 10/10
+Treino -> Perda: 0.5306, Acurácia: 0.8276
+Validação -> Perda: 0.5846, Acurácia: 0.8183
+
+[INFO] Tempo total de treinamento: 2307.96 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.8331
+              precision    recall  f1-score   support
+
+           1       0.91      0.94      0.92      3244
+           2       0.78      0.79      0.79       564
+           3       0.53      0.61      0.56       191
+           4       0.73      0.66      0.70       696
+           5       0.67      0.74      0.70       208
+           6       0.45      0.29      0.35        35
+           7       0.90      0.50      0.64       128
+           8       0.70      0.56      0.62       144
+           9       0.81      0.87      0.84       376
+          10       0.79      0.78      0.78       487
+          11       0.87      0.64      0.73       152
+
+    accuracy                           0.83      6225
+   macro avg       0.74      0.67      0.70      6225
+weighted avg       0.83      0.83      0.83      6225
+

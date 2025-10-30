@@ -1,0 +1,43 @@
+
+================================================================================
+[INFO] Treinando modelo: EfficientNet-B0 para o atributo: gender (Classes: 2)
+[INFO] A saída está sendo salva em: ./output-com_transfer_leaning/gender/EfficientNet-B0/terminal_output.txt
+================================================================================
+
+Época 1/6
+Treino -> Perda: 0.1922, Acurácia: 0.9222
+Validação -> Perda: 0.1642, Acurácia: 0.9365
+
+Época 2/6
+Treino -> Perda: 0.1094, Acurácia: 0.9586
+Validação -> Perda: 0.1460, Acurácia: 0.9470
+
+Época 3/6
+Treino -> Perda: 0.0765, Acurácia: 0.9715
+Validação -> Perda: 0.1476, Acurácia: 0.9476
+
+Época 4/6
+Treino -> Perda: 0.0558, Acurácia: 0.9792
+Validação -> Perda: 0.1711, Acurácia: 0.9504
+
+Época 5/6
+Treino -> Perda: 0.0427, Acurácia: 0.9844
+Validação -> Perda: 0.1630, Acurácia: 0.9499
+
+Época 6/6
+Treino -> Perda: 0.0359, Acurácia: 0.9869
+Validação -> Perda: 0.2510, Acurácia: 0.9422
+
+[INFO] Tempo total de treinamento: 1796.94 segundos
+
+[INFO] Avaliando no conjunto de teste com o melhor modelo...
+Acurácia (mACC) no Teste: 0.9496
+              precision    recall  f1-score   support
+
+  Not_gender       0.95      0.98      0.97      4447
+      gender       0.94      0.87      0.91      1778
+
+    accuracy                           0.95      6225
+   macro avg       0.95      0.93      0.94      6225
+weighted avg       0.95      0.95      0.95      6225
+
