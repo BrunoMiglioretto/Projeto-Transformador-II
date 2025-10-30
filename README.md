@@ -2,7 +2,25 @@
 
 > **Escopo:** classificação em imagens para os atributos `upper_color`, `lower_color`, `gender`, `bag` e `hat` do dataset **PAR2025**. Os experimentos avaliaram arquiteturas **EfficientNet-B0**, **MobileNetV2** e **SwinV2-T**, com e sem **transfer learning**, e com **data augmentation**.
 
------
+## Resultados dos Experimentos
+
+Devido ao tamanho dos arquivos de saída — especialmente os **pesos dos modelos (`.pth`)**, figuras de treinamento e matrizes de confusão —, os resultados completos **não foram incluídos diretamente neste repositório**, uma vez que o GitHub impõe um limite de **100 MB por arquivo** e **2 GB por pacote de push**.
+
+Todos os **artefatos experimentais completos** (modelos, relatórios CSV e gráficos) estão disponíveis no seguinte link público:
+
+> 📂 **[Acesse aqui os resultados completos no Google Drive](https://drive.google.com/drive/folders/1MN4NYTUKyvus_9fwL0zg_hl0edMl5mJh?usp=sharing)**
+
+**Conteúdo do link:**
+
+* Checkpoints dos modelos (`best_model.pth`) treinados em cada configuração (com/sem transfer learning, com/sem data augmentation).
+* Gráficos de acurácia e matrizes de confusão por arquitetura e tarefa.
+* Relatórios consolidados (`general_summary_report.csv` e `ensemble_summary_report.csv`).
+* Logs de treinamento (`terminal_output.txt`) e parâmetros utilizados.
+
+> **Observação:** os arquivos `.pth` e demais saídas são grandes (~100 MB cada) e foram movidos para o Google Drive apenas para **garantir reprodutibilidade** e **armazenamento persistente**, conforme práticas comuns em projetos de Deep Learning.
+
+---
+
 
 ## 1\) Estrutura de pastas (nível superior)
 
@@ -26,7 +44,6 @@
       * **`BASELINE-com_transfer_leaning/`**: resultados dos treinos **com** transferência de aprendizado (pesos pré-treinados). Estruturado por **tarefa** (`bag/`, `gender/`, `hat/`, `lower_color/`, `upper_color/`) e, dentro de cada tarefa, por **arquitetura** (`EfficientNet-B0/`, `MobileNetV2/`, `SwinV2-T/`). Cada arquitetura contém:
 
           * `accuracy_plot.png`: curva(s) de acurácia por época (treino/val).
-          * `best_model.pth`: pesos do melhor modelo (checkpoint) pelo critério de validação.
           * `confusion_matrix.png`: matriz de confusão no conjunto de validação/teste (conforme configurado).
           * `terminal_output.txt`: *stdout* completo do treino (épocas, métricas, tempos, etc.).
 
